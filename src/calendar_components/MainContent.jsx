@@ -26,19 +26,7 @@ const MainContent = () => {
   };
 
   const handleNewEvent = () => {
-    const now = new Date();
-    const roundedHour = new Date(now.setMinutes(0, 0, 0));
-    const defaultEvent = {
-      title: "",
-      description: "",
-      startTime: roundedHour,
-      endTime: new Date(roundedHour.getTime() + 60 * 60 * 1000), // 1 hour duration
-      location: "",
-      color: "#5b5fc7",
-      isRecurring: false,
-    };
-
-    setSelectedEvent(defaultEvent);
+    setSelectedEvent(null); // Pass null for new events
     setIsModalOpen(true);
   };
 

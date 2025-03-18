@@ -6,11 +6,12 @@ import styles from "./CalendarApp.module.css";
 
 export const EventModal = ({ event, onClose }) => {
   const dispatch = useEventDispatch();
+  const isEditMode = !!event; // Determine if the modal is in edit mode
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     startTime: new Date(),
-    endTime: new Date(),
+    endTime: new Date(new Date().getTime() + 60 * 60 * 1000), // Default 1-hour duration
     location: "",
     color: "#5b5fc7",
     isRecurring: false,
@@ -19,10 +20,23 @@ export const EventModal = ({ event, onClose }) => {
   });
 
   useEffect(() => {
-    if (event) {
-      setFormData(event);
+    if (isEditMode) {
+      setFormData(event); // Populate form with existing event data
+    } else {
+      // Reset form for new event
+      setFormData({
+        title: "",
+        description: "",
+        startTime: new Date(),
+        endTime: new Date(new Date().getTime() + 60 * 60 * 1000),
+        location: "",
+        color: "#5b5fc7",
+        isRecurring: false,
+        recurrencePattern: null,
+        attendees: [],
+      });
     }
-  }, [event]);
+  }, [event, isEditMode]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -39,14 +53,14 @@ export const EventModal = ({ event, onClose }) => {
 
       const eventData = {
         ...formData,
-        id: event?.id || crypto.randomUUID(),
+        id: isEditMode ? event.id : crypto.randomUUID(),
         title: formData.title.trim(),
         description: formData.description?.trim(),
         location: formData.location?.trim(),
       };
 
       dispatch({
-        type: event?.id ? "UPDATE_EVENT" : "ADD_EVENT",
+        type: isEditMode ? "UPDATE_EVENT" : "ADD_EVENT", // Differentiate between add and update
         event: eventData,
       });
 
@@ -57,7 +71,7 @@ export const EventModal = ({ event, onClose }) => {
   };
 
   const handleDelete = () => {
-    if (event?.id) {
+    if (isEditMode && event?.id) {
       dispatch({
         type: "DELETE_EVENT",
         id: event.id,
@@ -74,7 +88,7 @@ export const EventModal = ({ event, onClose }) => {
         aria-labelledby="event-modal-title"
       >
         <header className={styles.modalHeader}>
-          <h2 id="event-modal-title">{event ? "Edit Event" : "New Event"}</h2>
+          <h2 id="event-modal-title">{isEditMode ? "Edit Event" : "Add Event"}</h2>
           <button
             className={styles.closeButton}
             onClick={onClose}
@@ -190,7 +204,7 @@ export const EventModal = ({ event, onClose }) => {
           )}
 
           <div className={styles.modalActions}>
-            {event && (
+            {isEditMode && (
               <button
                 type="button"
                 onClick={handleDelete}
@@ -200,7 +214,7 @@ export const EventModal = ({ event, onClose }) => {
               </button>
             )}
             <button type="submit" className={styles.submitButton}>
-              {event ? "Update" : "Create"}
+              {isEditMode ? "Update" : "Add"}
             </button>
           </div>
         </form>
