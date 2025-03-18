@@ -4,8 +4,8 @@ import { useEvents, useEventDispatch } from "./EventContext";
 import { Event } from "./Event";
 import styles from "./CalendarApp.module.css";
 
-const DayColumn = ({ number, name, active, date, onEditEvent }) => {
-  const columnClass = active ? styles.dayColumnactive : styles.dayColumn;
+const DayColumn = ({ number, name, active, date, onEditEvent, className }) => {
+  const columnClass = `${active ? styles.dayColumnactive : styles.dayColumn} ${className}`;
   const events = useEvents();
   const dispatch = useEventDispatch();
 
