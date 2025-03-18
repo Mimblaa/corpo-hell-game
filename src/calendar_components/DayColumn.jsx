@@ -4,7 +4,7 @@ import { useEvents, useEventDispatch } from "./EventContext";
 import { Event } from "./Event";
 import styles from "./CalendarApp.module.css";
 
-const DayColumn = ({ number, name, active, date }) => {
+const DayColumn = ({ number, name, active, date, onEditEvent }) => {
   const columnClass = active ? styles.dayColumnactive : styles.dayColumn;
   const events = useEvents();
   const dispatch = useEventDispatch();
@@ -55,9 +55,7 @@ const DayColumn = ({ number, name, active, date }) => {
           <Event
             key={event.id}
             event={event}
-            onClick={(event) => {
-              // Handle event click - show modal
-            }}
+            onDoubleClick={() => onEditEvent(event)} // Open EventModal on double-click
           />
         ))}
       </div>

@@ -26,7 +26,7 @@ const CalendarGrid = ({ currentDate, onEventClick }) => {
   return (
     <div className={styles.calendarGrid}>
       <TimeColumn />
-      <DaysGrid dates={weekDates} events={events} onEventClick={onEventClick} />
+      <DaysGrid dates={weekDates} events={events} onEditEvent={onEventClick} />
     </div>
   );
 };
