@@ -72,9 +72,7 @@
 
 .dayColumnactive {
   border-left: 1px solid #e0e0e0;
-  background-color: rgba(91, 95, 199, 0.05);
 }
-
 
 .dayColumn {
   position: relative; 
@@ -82,7 +80,9 @@
   border-left: 1px solid #e0e0e0;
 }
 
-
+.dayColumn.currentDay {
+  background-color: #f3e8ff; /* Light purple background */
+}
 
 .dayHeader {
   color: #616161;
@@ -375,7 +375,6 @@
   border: none;
   cursor: pointer;
 }
-
 
 .dateSelector {
   color: #242424;
