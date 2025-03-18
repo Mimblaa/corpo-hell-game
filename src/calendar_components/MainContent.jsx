@@ -20,11 +20,6 @@ const MainContent = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const events = useEvents();
 
-  const handleEventClick = (event) => {
-    setSelectedEvent(event);
-    setIsModalOpen(true);
-  };
-
   const handleCloseModal = () => {
     setSelectedEvent(null);
     setIsModalOpen(false);
@@ -45,6 +40,11 @@ const MainContent = () => {
 
     setSelectedEvent(defaultEvent);
     setIsModalOpen(true);
+  };
+
+  const handleEditEvent = (event) => {
+    setSelectedEvent(event); // Set the selected event for editing
+    setIsModalOpen(true); // Open the modal
   };
 
   // Funkcje do zmiany daty tygodnia
@@ -73,7 +73,10 @@ const MainContent = () => {
         currentWeek={firstDayOfWeek}
       />
       {/* Przekazujemy datę do CalendarGrid */}
-      <CalendarGrid currentDate={currentDate} onEventClick={handleEventClick} />
+      <CalendarGrid
+        currentDate={currentDate}
+        onEventClick={handleEditEvent} // Pass the edit handler
+      />
       {isModalOpen && <EventModal event={selectedEvent} onClose={handleCloseModal} />}
     </section>
   );

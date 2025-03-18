@@ -3,7 +3,7 @@ import React from "react";
 import { useDrag } from "react-dnd";
 import styles from "./CalendarApp.module.css";
 
-export const Event = ({ event, onClick }) => {
+export const Event = ({ event, onDoubleClick }) => {
   const [{ isDragging }, drag] = useDrag({
     type: "EVENT",
     item: { id: event.id, type: "EVENT" },
@@ -27,7 +27,7 @@ export const Event = ({ event, onClick }) => {
         backgroundColor: event.color || "#5b5fc7",
         opacity: isDragging ? 0.5 : 1,
       }}
-      onDoubleClick={() => onClick(event)}
+      onDoubleClick={onDoubleClick} // Handle double-click
     >
       <h3 className={styles.eventTitle}>{event.title}</h3>
       <p className={styles.eventTime}>
