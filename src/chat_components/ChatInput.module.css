@@ -1,0 +1,85 @@
+.inputContainer {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1px 7px 1px 2px;
+    margin: 20px;
+}
+
+.textInput {
+    flex: 1;
+    border: none;
+    padding: 12px;
+    color: #616161;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.textInput:focus {
+    color: #242424;
+}
+
+.textInput::placeholder {
+    color: #616161;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.formatOptions {
+    width: 21px;
+    object-fit: contain;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.sendAIButton {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sendAIIcon {
+    width: 21px;
+    aspect-ratio: 0.93;
+    object-fit: contain;
+}
+
+.sendButton {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sendIcon {
+    width: 21px;
+    aspect-ratio: 0.93;
+    object-fit: contain;
+}
+
+@media (width <=991px) {
+    .inputContainer {
+        margin: 10px;
+    }
+    .formatOptions {
+        width: 100px;
+    }
+}

@@ -1,0 +1,48 @@
+.header {
+    background-color: #ebebeb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 8px 2px 2px;
+    width: 100%;
+    gap: 20px;
+}
+
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+}
+
+.logo {
+    width: 44px;
+    aspect-ratio: 1.42;
+    object-fit: contain;
+}
+
+.profileSection {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.settingsIcon {
+    width: 22px;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.profileIcon {
+    width: 40px;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+@media (width <=991px) {
+    .header {
+        padding: 2px 4px;
+    }
+}

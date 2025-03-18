@@ -1,0 +1,113 @@
+.chatContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    height: 100%;
+    overflow: hidden;
+}
+
+.chatHeader {
+    background-color: #fff;
+    padding: 1px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+    min-height: 60px;
+}
+
+.participantsInfo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.participants {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.participantAvatar {
+    width: 32px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    object-fit: contain;
+}
+
+.participantNames {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.participantName {
+    color: #242424;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.participantEmail {
+    color: #242424;
+    font-size: 16px;
+}
+
+.chatType {
+    color: #242424;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.chatActions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.meetingButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #424242;
+    font-family: Inter, -apple-system, Roboto, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.actionIcon {
+    width: 20px;
+    aspect-ratio: 1;
+    object-fit: contain;
+}
+
+.participantCount {
+    color: #424242;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.messageList {
+    flex: 1;
+    padding: 20px 80px;
+    overflow-y: auto;
+    height: calc(100% - 180px);
+}
+
+@media (width <=991px) {
+    .messageList {
+        padding: 20px;
+    }
+    .chatHeader {
+        flex-direction: column;
+        padding: 10px;
+    }
+    .participantsInfo {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
