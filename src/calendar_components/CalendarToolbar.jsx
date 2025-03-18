@@ -4,7 +4,7 @@ import calendarIcon from "../assets/icons/calendar-icon.png";
 import arrowIcon from "../assets/icons/arrow.png";
 import dropdownIcon from "../assets/icons/dropdown.png";
 
-const CalendarToolbar = ({ onPrevWeek, onNextWeek, currentWeek }) => {
+const CalendarToolbar = ({ onPrevWeek, onNextWeek, currentWeek, onToday }) => {
   const formattedDate = `${currentWeek.toLocaleDateString("pl-PL", {
     weekday: "short",
     day: "numeric",
@@ -12,10 +12,16 @@ const CalendarToolbar = ({ onPrevWeek, onNextWeek, currentWeek }) => {
     year: "numeric",
   })}`;
 
+  const handleTodayClick = () => {
+    if (onToday) {
+      onToday(); // Ensure the onToday function is called
+    }
+  };
+
   return (
     <div className={styles.toolbar}>
       <div className={styles.toolbarLeft}>
-        <button className={styles.toolbarButton}>
+        <button className={styles.toolbarButton} onClick={handleTodayClick}>
           <img src={calendarIcon} alt="Calendar Icon" width="17" height="17" />
           <span>Dzisiaj</span>
         </button>

@@ -9,8 +9,8 @@ import { useEvents } from "./EventContext";
 
 // Funkcja pomocnicza do uzyskania daty pierwszego dnia tygodnia
 const getFirstDayOfWeek = (date) => {
-  const dayOfWeek = date.getDay();
-  const diff = date.getDate() - dayOfWeek;
+  const dayOfWeek = date.getDay() || 7; // Treat Sunday (0) as the last day of the week (7)
+  const diff = date.getDate() - dayOfWeek + 1; // Adjust to Monday as the first day of the week
   return new Date(date.setDate(diff));
 };
 
@@ -48,6 +48,10 @@ const MainContent = () => {
     setCurrentDate(newDate);
   };
 
+  const handleToday = () => {
+    setCurrentDate(new Date()); // Set the current week to today's date
+  };
+
   // Ustalamy datę pierwszego dnia tygodnia
   const firstDayOfWeek = getFirstDayOfWeek(currentDate);
 
@@ -58,6 +62,7 @@ const MainContent = () => {
       <CalendarToolbar
         onPrevWeek={handlePrevWeek}
         onNextWeek={handleNextWeek}
+        onToday={handleToday}
         currentWeek={firstDayOfWeek}
       />
       {/* Przekazujemy datę do CalendarGrid */}
