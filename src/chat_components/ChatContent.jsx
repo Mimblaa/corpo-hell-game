@@ -10,18 +10,20 @@ import videoIcon from '../assets/icons/video-icon.png';
 import moreOptionsIcon from '../assets/icons/more-options-participants.png';
 import yourAvatar from '../assets/icons/profile-icon.png';
 
-const ChatContent = () => {
+const ChatContent = ({ selectedChatId, chatName }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
+      chatId: 1,
       sender: "user1",
       message: "message 1 to pisze ai",
       time: "26.04.24 09:34",
       avatar: participantAvatar,
-      isAI: true, // This flag helps determine if the message is from AI
+      isAI: true,
     },
     {
       id: 2,
+      chatId: 1,
       sender: "to ty",
       message: "Inna wiadomosc ble ble to ty piszesz",
       time: "26.04.24 09:35",
@@ -33,12 +35,17 @@ const ChatContent = () => {
   const [isInMeeting, setIsInMeeting] = useState(false);
   const messageListRef = useRef(null);
 
+  const filteredMessages = messages.filter(
+    (message) => message.chatId === selectedChatId
+  );
+
   const handleSendMessage = (message, isAI = false) => {
     if (!message.trim()) return;
 
     const newMessage = {
       id: messages.length + 1,
-      sender: isAI ? "AI" : "Twoj nick",  // AI messages have different sender name
+      chatId: selectedChatId, 
+      sender: isAI ? "AI" : "Twoj nick",  
       message,
       time: new Date()
         .toLocaleString("pl-PL", {
@@ -49,8 +56,8 @@ const ChatContent = () => {
           year: "2-digit",
         })
         .replace(",", ""),
-      avatar: isAI ? participantAvatar : yourAvatar,  // Use a different avatar for AI
-      isAI,  // Flag to identify AI messages
+      avatar: isAI ? participantAvatar : yourAvatar, 
+      isAI,
     };
 
     setMessages([...messages, newMessage]);
@@ -78,10 +85,9 @@ const ChatContent = () => {
               className={styles.participantAvatar}
             />
             <div className={styles.participantNames}>
-              <span className={styles.participantName}>user1, user2, user3</span>
+              <span className={styles.participantName}>{chatName}</span> {/* Display chat name */}
             </div>
           </div>
-          <div className={styles.chatType}>Czat</div>
         </div>
         <div className={styles.chatActions}>
           <button
@@ -112,7 +118,7 @@ const ChatContent = () => {
       </header>
 
       <div className={styles.messageList} ref={messageListRef}>
-        {messages.map((message) => (
+        {filteredMessages.map((message) => (
           <MessageBubble
             key={message.id}
             message={message.message}

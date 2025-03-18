@@ -2,10 +2,9 @@
 import React, { useState } from "react";
 import AppHeader from "./AppHeader";
 import Sidebar from "./Sidebar";
-import ChatList from "./chat_components/ChatList";
-import ChatContent from "./chat_components/ChatContent";
 import CalendarSection from "./calendar_components/CalendarSection";
 import TaskSection from "./task_components/TaskSection";
+import ChatSection from "./chat_components/ChatSection"; // Import ChatSection
 import styles from "./AppLayout.module.css";
 
 const AppLayout = () => {
@@ -23,17 +22,11 @@ const AppLayout = () => {
   const renderContent = () => {
     switch (activeSection) {
       case "chat":
-        return (
-          <>
-            <ChatList searchQuery={searchQuery} />
-            <ChatContent />
-          </>
-        );
+        return <ChatSection />; // Use ChatSection
       case "calendar":
         return <CalendarSection searchQuery={searchQuery} />;
-
       case "tasks":
-          return <TaskSection searchQuery={searchQuery} />;
+        return <TaskSection searchQuery={searchQuery} />;
       default:
         return null;
     }
