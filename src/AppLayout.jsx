@@ -4,7 +4,8 @@ import AppHeader from "./AppHeader";
 import Sidebar from "./Sidebar";
 import CalendarSection from "./calendar_components/CalendarSection";
 import TaskSection from "./task_components/TaskSection";
-import ChatSection from "./chat_components/ChatSection"; // Import ChatSection
+import ChatSection from "./chat_components/ChatSection";
+import AppsSection from "./apps_components/AppsSection";
 import styles from "./AppLayout.module.css";
 
 const AppLayout = () => {
@@ -27,6 +28,8 @@ const AppLayout = () => {
         return <CalendarSection searchQuery={searchQuery} />;
       case "tasks":
         return <TaskSection searchQuery={searchQuery} />;
+      case "apps":
+        return <AppsSection />;
       default:
         return null;
     }
