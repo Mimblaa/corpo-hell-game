@@ -6,7 +6,8 @@ import CalendarSection from "./calendar_components/CalendarSection";
 import TaskSection from "./task_components/TaskSection";
 import ChatSection from "./chat_components/ChatSection";
 import AppsSection from "./apps_components/AppsSection";
-import OneDriveSection from "./onedrive_components/OneDriveSection"; // Import the OneDrive section
+import OneDriveSection from "./onedrive_components/OneDriveSection";
+import CallsSection from "./calls_components/CallsSection";
 import styles from "./AppLayout.module.css";
 
 const AppLayout = () => {
@@ -45,6 +46,8 @@ const AppLayout = () => {
         return <AppsSection />;
       case "onedrive":
         return <OneDriveSection />;
+      case "calls":
+        return <CallsSection />;
       default:
         return null;
     }
