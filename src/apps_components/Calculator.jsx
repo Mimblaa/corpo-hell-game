@@ -8,9 +8,19 @@ const Calculator = ({ tasks }) => {
     return { question: `${num1} + ${num2} = ?`, answer: num1 + num2 };
   };
 
-  const [mathProblem, setMathProblem] = useState(generateMathProblem());
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [mathProblem, setMathProblem] = useState(null);
   const [userAnswer, setUserAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
+
+  const handleTaskSelect = (e) => {
+    const taskId = e.target.value;
+    const task = tasks.find((task) => task.id === taskId);
+    setSelectedTask(task);
+    setMathProblem(generateMathProblem());
+    setFeedback("");
+    setUserAnswer("");
+  };
 
   const handleSubmit = () => {
     if (parseInt(userAnswer, 10) === mathProblem.answer) {
@@ -20,29 +30,51 @@ const Calculator = ({ tasks }) => {
     }
   };
 
+  const handleCloseQuestion = () => {
+    setSelectedTask(null);
+    setMathProblem(null);
+    setFeedback("");
+    setUserAnswer("");
+  };
+
   return (
     <>
-      <h2>Rozwiąż zadanie matematyczne</h2>
-      <p>{mathProblem.question}</p>
-      <input
-        type="number"
-        value={userAnswer}
-        onChange={(e) => setUserAnswer(e.target.value)}
-        className={styles.input}
-      />
-      <button onClick={handleSubmit} className={styles.submitButton}>
-        Akceptuj
-      </button>
-      {feedback && <p className={styles.feedback}>{feedback}</p>}
-      <h3>Zadania związane z Kalkulatorem</h3>
-      <select className={styles.select}>
-        <option value="">Wybierz zadanie</option>
-        {tasks.map((task) => (
-          <option key={task.id} value={task.id}>
-            {task.title} - {task.course}
-          </option>
-        ))}
-      </select>
+      <h2>Kalkulator</h2>
+      {!mathProblem ? (
+        <>
+          <h3>Zadania związane z Kalkulatorem</h3>
+          <select
+            className={styles.select}
+            onChange={handleTaskSelect}
+            value={selectedTask?.id || ""}
+          >
+            <option value="">Wybierz zadanie</option>
+            {tasks.map((task) => (
+              <option key={task.id} value={task.id}>
+                {task.title} - {task.course}
+              </option>
+            ))}
+          </select>
+        </>
+      ) : (
+        <>
+          <h2>Rozwiąż zadanie matematyczne</h2>
+          <p>{mathProblem.question}</p>
+          <input
+            type="number"
+            value={userAnswer}
+            onChange={(e) => setUserAnswer(e.target.value)}
+            className={styles.input}
+          />
+          <button onClick={handleSubmit} className={styles.submitButton}>
+            Akceptuj
+          </button>
+          {feedback && <p className={styles.feedback}>{feedback}</p>}
+          <button onClick={handleCloseQuestion} className={styles.closeButton}>
+            Zamknij pytanie
+          </button>
+        </>
+      )}
     </>
   );
 };
