@@ -4,6 +4,7 @@ import styles from "./TaskSection.module.css";
 import PrioritySelector from "./PrioritySelector";
 import TagSelector from "./TagSelector";
 import FileUpload from "./FileUpload";
+import { predefinedCourses, predefinedTags } from "./types";
 
 const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -69,15 +70,23 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
             <label htmlFor="course" className={styles.label}>
               Przedmiot
             </label>
-            <input
-              type="text"
+            <select
               id="course"
               name="course"
               value={formData.course}
               onChange={handleChange}
               className={styles.input}
               required
-            />
+            >
+              <option value="" disabled>
+                Wybierz przedmiot
+              </option>
+              {predefinedCourses.map((course) => (
+                <option key={course} value={course}>
+                  {course}
+                </option>
+              ))}
+            </select>
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="dueDate" className={styles.label}>
@@ -108,6 +117,7 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
             <TagSelector
               selectedTags={formData.tags}
               onChange={(tags) => setFormData((prev) => ({ ...prev, tags }))}
+              predefinedTags={predefinedTags}
             />
           </div>
 

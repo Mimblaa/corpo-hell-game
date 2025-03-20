@@ -10,3 +10,24 @@ export const taskStatus = {
   COMPLETED: "Ukończone",
   LATE: "Po terminie",
 };
+
+export const predefinedCourses = [
+  "Grafika",
+  "Statystyka",
+  "Internet",
+  "Notatki",
+  "Matematyka",
+];
+
+export const predefinedTags = [
+  "prezentacja",
+  "projekt",
+  "zadanie",
+  "statystyka",
+  "raport",
+  "badania",
+  "grupowy",
+  "matematyka",
+  "notatki",
+  "spotkania",
+];

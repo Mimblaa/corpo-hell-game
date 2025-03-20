@@ -11,9 +11,9 @@ const defaultTags = [
   "Prezentacja",
 ];
 
-const TagSelector = ({ selectedTags, onChange }) => {
+const TagSelector = ({ selectedTags, onChange, predefinedTags = [] }) => {
   const [inputValue, setInputValue] = useState("");
-  const [tags, setTags] = useState(defaultTags);
+  const [tags, setTags] = useState(predefinedTags);
 
   const handleAddTag = (tag) => {
     if (!selectedTags.includes(tag)) {

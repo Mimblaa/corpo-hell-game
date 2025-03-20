@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./TaskSection.module.css";
 import ContentHeader from "./ContentHeader";
 import TaskList from "./TaskList";
@@ -7,67 +7,75 @@ import TaskFormModal from "./TaskFormModal";
 import { TabType } from "./types";
 
 const MainContent = () => {
+  const defaultTasks = [
+      {
+        id: 1,
+        title: "Przygotowanie prezentacji",
+        dueDate: "2026-12-15T10:00:00",
+        course: "Grafika",
+        status: "Nie przesłano",
+        priority: "high", 
+        tags: ["prezentacja", "projekt"],
+      },
+      {
+        id: 2,
+        title: "Utworz zbiór danych",
+        dueDate: "2026-12-20T23:59:00",
+        course: "Statystyka",
+        status: "Nie przesłano",
+        priority: "medium", 
+        tags: ["zadanie", "statystyka"],
+      },
+      // Example overdue tasks
+      {
+        id: 3,
+        title: "Raport z badań",
+        dueDate: "2023-11-30T23:59:00",
+        course: "Internet",
+        status: "Po terminie",
+        priority: "low", 
+        tags: ["raport", "badania"],
+      },
+      {
+        id: 4,
+        title: "Prześij notatki z projektu",
+        dueDate: "2023-11-25T18:00:00",
+        course: "Notatki",
+        status: "Po terminie",
+        priority: "high", 
+        tags: ["projekt", "notatki"],
+      },
+      {
+        id: 5,
+        title: "Oblicz braki w danych",
+        dueDate: "2023-11-20T12:00:00",
+        course: "Matematyka",
+        status: "Ukończone",
+        priority: "medium", 
+        tags: ["matematyka"],
+      },
+      {
+        id: 6,
+        title: "Przygotuj agende spotkania",
+        dueDate: "2023-11-18T14:00:00",
+        course: "Internet",
+        status: "Ukończone",
+        priority: "low", 
+        tags: ["spotkania"],
+      }, 
+  ];
+
   const [activeTab, setActiveTab] = useState(TabType.UPCOMING);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tasks, setTasks] = useState([
-    // Example upcoming tasks
-    {
-      id: 1,
-      title: "Przygotowanie prezentacji",
-      dueDate: "2026-12-15T10:00:00",
-      course: "Grafika",
-      status: "Nie przesłano",
-      priority: "high", 
-      tags: ["prezentacja", "projekt"],
-    },
-    {
-      id: 2,
-      title: "Zadanie domowe - Statystyka",
-      dueDate: "2026-12-20T23:59:00",
-      course: "Statystyka",
-      status: "Nie przesłano",
-      priority: "medium", 
-      tags: ["zadanie", "statystyka"],
-    },
-    // Example overdue tasks
-    {
-      id: 3,
-      title: "Raport z badań",
-      dueDate: "2023-11-30T23:59:00",
-      course: "Internet",
-      status: "Po terminie",
-      priority: "low", 
-      tags: ["raport", "badania"],
-    },
-    {
-      id: 4,
-      title: "Projekt grupowy - Informatyka",
-      dueDate: "2023-11-25T18:00:00",
-      course: "Notatki",
-      status: "Po terminie",
-      priority: "high", 
-      tags: ["projekt", "grupowy"],
-    },
-    // Example completed tasks
-    {
-      id: 5,
-      title: "Egzamin próbny - Matematyka",
-      dueDate: "2023-11-20T12:00:00",
-      course: "Matematyka",
-      status: "Ukończone",
-      priority: "medium", 
-      tags: ["egzamin", "matematyka"],
-    },
-    {
-      id: 6,
-      title: "Laboratorium - Chemia",
-      dueDate: "2023-11-18T14:00:00",
-      course: "Internet",
-      status: "Ukończone",
-      priority: "low", 
-      tags: ["laboratorium", "chemia"],
-    },
-  ]);
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("tasks");
+    return savedTasks ? [...defaultTasks, ...JSON.parse(savedTasks)] : defaultTasks;
+  });
+
+  useEffect(() => {
+    // Save tasks to localStorage whenever they change
+    localStorage.setItem("tasks", JSON.stringify(tasks.filter((task) => !defaultTasks.some((dt) => dt.id === task.id))));
+  }, [tasks]);
 
   const handleAddTask = (taskData) => {
     const newTask = {
