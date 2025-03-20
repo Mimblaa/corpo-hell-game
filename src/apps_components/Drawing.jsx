@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import styles from "./AppsSection.module.css";
 
-const Drawing = ({ tasks }) => {
+const Drawing = ({ tasks, setTasks }) => {
   const [selectedTask, setSelectedTask] = useState(null); // Track selected task
   const [feedback, setFeedback] = useState("");
   const [canvasHeight, setCanvasHeight] = useState(window.innerHeight * 0.3);
@@ -35,7 +35,14 @@ const Drawing = ({ tasks }) => {
   };
 
   const handleSubmit = () => {
-    setFeedback("Brawo! Zadanie wykonane.");
+    if (selectedTask) {
+      setFeedback("Brawo! Zadanie wykonane.");
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
+        )
+      );
+    }
   };
 
   const handleClose = () => {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
 
-const Browser = ({ tasks }) => {
+const Browser = ({ tasks, setTasks }) => {
   const [generalQuestion] = useState({
     question: "Jakie jest największe zwierzę na świecie?",
     options: ["A. Słoń afrykański", "B. Płetwal błękitny", "C. Rekin wielorybi"],
@@ -9,21 +9,25 @@ const Browser = ({ tasks }) => {
   });
   const [generalAnswer, setGeneralAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [selectedTask, setSelectedTask] = useState("");
 
   const handleSubmit = () => {
     if (generalAnswer === generalQuestion.answer) {
       setFeedback("Brawo! Poprawna odpowiedź.");
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === parseInt(selectedTask) ? { ...task, status: "Ukończone" } : task
+        )
+      );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");
     }
   };
 
   const handleReset = () => {
-    setSelectedTask(""); // Reset selected task
-    setFeedback(""); // Clear feedback
+    setSelectedTask("");
+    setFeedback("");
   };
-
-  const [selectedTask, setSelectedTask] = useState("");
 
   return (
     <>
@@ -51,7 +55,7 @@ const Browser = ({ tasks }) => {
                 <input
                   type="radio"
                   name="generalQuestion"
-                  value={option[0]} // Extract the letter (A, B, C)
+                  value={option[0]}
                   onChange={(e) => setGeneralAnswer(e.target.value)}
                 />
                 {option}
@@ -62,7 +66,7 @@ const Browser = ({ tasks }) => {
             Akceptuj
           </button>
           {feedback && <p className={styles.feedback}>{feedback}</p>}
-{feedback && (
+          {feedback && (
             <button onClick={handleReset} className={styles.resetButton}>
               Wróć do wyboru zadania
             </button>

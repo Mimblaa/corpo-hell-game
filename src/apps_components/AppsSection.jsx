@@ -30,9 +30,8 @@ const AppsSection = () => {
   });
 
   useEffect(() => {
-    const savedTasks = localStorage.getItem("tasks");
-    setTasks(savedTasks ? JSON.parse(savedTasks) : []);
-  }, []);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   const filteredTasks = tasks.filter(
     (task) => task.status === "Nie przesłano" || task.status === "Po terminie"
@@ -69,7 +68,10 @@ const AppsSection = () => {
           <button onClick={handleBackToApps} className={styles.backButton}>
             Wróć do aplikacji
           </button>
-          <selectedApp.component tasks={filteredTasks.filter(selectedApp.filter)} />
+          <selectedApp.component
+            tasks={filteredTasks.filter(selectedApp.filter)}
+            setTasks={setTasks} // Pass setTasks here
+          />
         </div>
       )}
     </section>

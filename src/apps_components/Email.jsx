@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
 
-const Email = ({ tasks }) => {
+const Email = ({ tasks, setTasks }) => {
   const [emailTask] = useState({
     recipient: "Jan Kowalski",
     message: "Cześć, jak się masz?",
@@ -13,8 +13,13 @@ const Email = ({ tasks }) => {
   const [showTask, setShowTask] = useState(false);
 
   const handleSubmit = () => {
-    if (recipient === emailTask.recipient && message === emailTask.message) {
+    if (selectedTask && recipient === emailTask.recipient && message === emailTask.message) {
       setFeedback("Brawo! Mail został poprawnie wysłany.");
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === parseInt(selectedTask) ? { ...task, status: "Ukończone" } : task
+        )
+      );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");
     }

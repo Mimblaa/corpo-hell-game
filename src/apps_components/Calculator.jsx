@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
 
-const Calculator = ({ tasks }) => {
+const Calculator = ({ tasks, setTasks }) => {
   const generateMathProblem = () => {
     const num1 = Math.floor(Math.random() * 10) + 1;
     const num2 = Math.floor(Math.random() * 10) + 1;
@@ -14,7 +14,7 @@ const Calculator = ({ tasks }) => {
   const [feedback, setFeedback] = useState("");
 
   const handleTaskSelect = (e) => {
-    const taskId = e.target.value;
+    const taskId = parseInt(e.target.value, 10); // Ensure taskId is a number
     const task = tasks.find((task) => task.id === taskId);
     setSelectedTask(task);
     setMathProblem(generateMathProblem());
@@ -23,8 +23,14 @@ const Calculator = ({ tasks }) => {
   };
 
   const handleSubmit = () => {
-    if (parseInt(userAnswer, 10) === mathProblem.answer) {
+    console.log(selectedTask);
+    if (selectedTask && parseInt(userAnswer, 10) === mathProblem.answer) {
       setFeedback("Brawo! Poprawna odpowiedź.");
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
+        )
+      );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");
     }
@@ -40,24 +46,29 @@ const Calculator = ({ tasks }) => {
   return (
     <>
       <h2>Kalkulator</h2>
-      {!mathProblem ? (
-        <>
-          <h3>Zadania związane z Kalkulatorem</h3>
-          <select
-            className={styles.select}
-            onChange={handleTaskSelect}
-            value={selectedTask?.id || ""}
-          >
-            <option value="">Wybierz zadanie</option>
-            {tasks.map((task) => (
-              <option key={task.id} value={task.id}>
-                {task.title} - {task.course}
-              </option>
-            ))}
-          </select>
-        </>
-      ) : (
-        <>
+      <h3>Zadania związane z Kalkulatorem</h3>
+      <select
+        className={styles.select}
+        onChange={handleTaskSelect}
+        value={selectedTask?.id || ""}
+      >
+        <option value="">Wybierz zadanie</option>
+        {tasks.map((task) => (
+          <option key={task.id} value={task.id}>
+            {task.title} - {task.course}
+          </option>
+        ))}
+      </select>
+      {selectedTask && (
+        <div className={styles.taskDetails}>
+          <h4>Wybrane zadanie:</h4>
+          <p><strong>Tytuł:</strong> {selectedTask.title}</p>
+          <p><strong>Kurs:</strong> {selectedTask.course}</p>
+          <p><strong>Opis:</strong> {selectedTask.description}</p>
+        </div>
+      )}
+      {mathProblem && (
+        <div className={styles.mathProblem}>
           <h2>Rozwiąż zadanie matematyczne</h2>
           <p>{mathProblem.question}</p>
           <input
@@ -73,7 +84,7 @@ const Calculator = ({ tasks }) => {
           <button onClick={handleCloseQuestion} className={styles.closeButton}>
             Zamknij pytanie
           </button>
-        </>
+        </div>
       )}
     </>
   );

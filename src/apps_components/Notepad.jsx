@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
 
-const Notepad = ({ tasks }) => {
+const Notepad = ({ tasks, setTasks }) => {
   const [transcriptionTask] = useState(
     "Przepisz ten tekst dokładnie: 'Witaj w Notatniku!'"
   );
@@ -11,9 +11,10 @@ const Notepad = ({ tasks }) => {
   const [showTranscription, setShowTranscription] = useState(false);
 
   const handleTaskSelect = (e) => {
-    const taskId = e.target.value;
+    const taskId = parseInt(e.target.value, 10); // Ensure taskId is a number
+    const task = tasks.find((task) => task.id === taskId);
+    setSelectedTask(task);
     if (taskId) {
-      setSelectedTask(tasks.find((task) => task.id === taskId));
       setShowTranscription(true);
       setUserText("");
       setFeedback("");
@@ -26,8 +27,14 @@ const Notepad = ({ tasks }) => {
   };
 
   const handleSubmit = () => {
-    if (userText === transcriptionTask.split(": ")[1].replace(/'/g, "")) {
+    const expectedText = transcriptionTask.split(": ")[1].replace(/'/g, "").trim();
+    if (selectedTask && userText.trim() === expectedText) {
       setFeedback("Brawo! Poprawnie przepisałeś tekst.");
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
+        )
+      );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");
     }
@@ -36,19 +43,25 @@ const Notepad = ({ tasks }) => {
   return (
     <>
       <h3>Zadania związane z Notatkami</h3>
-      {!showTranscription && (
-        <select
-          className={styles.select}
-          onChange={handleTaskSelect}
-          value={selectedTask?.id || ""}
-        >
-          <option value="">Wybierz zadanie</option>
-          {tasks.map((task) => (
-            <option key={task.id} value={task.id}>
-              {task.title} - {task.course}
-            </option>
-          ))}
-        </select>
+      <select
+        className={styles.select}
+        onChange={handleTaskSelect}
+        value={selectedTask?.id || ""}
+      >
+        <option value="">Wybierz zadanie</option>
+        {tasks.map((task) => (
+          <option key={task.id} value={task.id}>
+            {task.title} - {task.course}
+          </option>
+        ))}
+      </select>
+      {selectedTask && (
+        <div className={styles.taskDetails}>
+          <h4>Wybrane zadanie:</h4>
+          <p><strong>Tytuł:</strong> {selectedTask.title}</p>
+          <p><strong>Kurs:</strong> {selectedTask.course}</p>
+          <p><strong>Opis:</strong> {selectedTask.description}</p>
+        </div>
       )}
       {showTranscription && (
         <>
