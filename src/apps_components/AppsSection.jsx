@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./AppsSection.module.css";
 
 import calculatorIcon from "../assets/icons/calculator.svg";
@@ -23,8 +23,20 @@ const apps = [
 ];
 
 const AppsSection = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(() => {
+    // Load modal state from localStorage or default to false
+    return localStorage.getItem("isModalOpen") === "true";
+  });
+  const [modalContent, setModalContent] = useState(() => {
+    // Load modal content from localStorage or default to null
+    return localStorage.getItem("modalContent") || null;
+  });
+
+  useEffect(() => {
+    // Save modal state and content to localStorage whenever they change
+    localStorage.setItem("isModalOpen", isModalOpen);
+    localStorage.setItem("modalContent", modalContent);
+  }, [isModalOpen, modalContent]);
 
   const handleAppClick = (appName) => {
     setModalContent(appName);

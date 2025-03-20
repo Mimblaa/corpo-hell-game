@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./CalendarApp.module.css";
 import CalendarHeader from "./CalendarHeader";
 import CalendarToolbar from "./CalendarToolbar";
@@ -7,7 +7,6 @@ import CalendarGrid from "./CalendarGrid";
 import { EventModal } from "./EventModal";
 import { useEvents } from "./EventContext";
 
-// Funkcja pomocnicza do uzyskania daty pierwszego dnia tygodnia
 const getFirstDayOfWeek = (date) => {
   const dayOfWeek = date.getDay() || 7; // Treat Sunday (0) as the last day of the week (7)
   const diff = date.getDate() - dayOfWeek + 1; // Adjust to Monday as the first day of the week
@@ -17,8 +16,17 @@ const getFirstDayOfWeek = (date) => {
 const MainContent = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(() => {
+    // Load current date from localStorage or default to today
+    const savedDate = localStorage.getItem("currentDate");
+    return savedDate ? new Date(savedDate) : new Date();
+  });
   const events = useEvents();
+
+  useEffect(() => {
+    // Save current date to localStorage whenever it changes
+    localStorage.setItem("currentDate", currentDate.toISOString());
+  }, [currentDate]);
 
   const handleCloseModal = () => {
     setSelectedEvent(null);
@@ -35,16 +43,15 @@ const MainContent = () => {
     setIsModalOpen(true); // Open the modal
   };
 
-  // Funkcje do zmiany daty tygodnia
   const handlePrevWeek = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() - 7); // Cofnij o 7 dni
+    newDate.setDate(currentDate.getDate() - 7); // Move back 7 days
     setCurrentDate(newDate);
   };
 
   const handleNextWeek = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + 7); // Przesuń o 7 dni do przodu
+    newDate.setDate(currentDate.getDate() + 7); // Move forward 7 days
     setCurrentDate(newDate);
   };
 
@@ -52,23 +59,20 @@ const MainContent = () => {
     setCurrentDate(new Date()); // Set the current week to today's date
   };
 
-  // Ustalamy datę pierwszego dnia tygodnia
   const firstDayOfWeek = getFirstDayOfWeek(currentDate);
 
   return (
     <section className={styles.mainContent}>
       <CalendarHeader onNewEvent={handleNewEvent} />
-      {/* Przekazujemy funkcje zmiany tygodnia i datę do CalendarToolbar */}
       <CalendarToolbar
         onPrevWeek={handlePrevWeek}
         onNextWeek={handleNextWeek}
         onToday={handleToday}
         currentWeek={firstDayOfWeek}
       />
-      {/* Przekazujemy datę do CalendarGrid */}
       <CalendarGrid
         currentDate={currentDate}
-        onEventClick={handleEditEvent} // Pass the edit handler
+        onEventClick={handleEditEvent}
       />
       {isModalOpen && <EventModal event={selectedEvent} onClose={handleCloseModal} />}
     </section>
