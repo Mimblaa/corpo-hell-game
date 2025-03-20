@@ -32,13 +32,14 @@ const Browser = ({ tasks }) => {
       </button>
       {feedback && <p className={styles.feedback}>{feedback}</p>}
       <h2>Zadania związane z Internetem</h2>
-      <ul>
+      <select className={styles.select}>
+        <option value="">Wybierz zadanie</option>
         {tasks.map((task) => (
-          <li key={task.id}>
-            <strong>{task.title}</strong> - {task.course}
-          </li>
+          <option key={task.id} value={task.id}>
+            {task.title} - {task.course}
+          </option>
         ))}
-      </ul>
+      </select>
     </>
   );
 };

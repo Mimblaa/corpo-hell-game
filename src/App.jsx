@@ -71,7 +71,6 @@ function App() {
         priority: "medium", 
         tags: ["zadanie", "statystyka"],
       },
-      // Example overdue tasks
       {
         id: 3,
         title: "Raport z badań",
@@ -113,10 +112,19 @@ function App() {
         title: "Odpisz klientowi",
         dueDate: "2023-11-18T14:00:00",
         course: "Korespondencja",
-        status: "Nie przesłano",
+        status: "Po terminie",
         priority: "low", 
         tags: ["mail"],
       }, 
+      {
+        id: 8,
+        title: "Przeslij oferty",
+        dueDate: "2025-11-18T14:00:00",
+        course: "Korespondencja",
+        status: "Po terminie",
+        priority: "low", 
+        tags: ["mail"],
+      },
   ];
 
 

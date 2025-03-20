@@ -23,23 +23,27 @@ const Email = ({ tasks }) => {
       <h2>Poczta</h2>
       <p>Wyślij wiadomość e-mail.</p>
       <h3>Zadania związane z Pocztą</h3>
-      <ul>
+      <select className={styles.select}>
+        <option value="">Wybierz zadanie</option>
         {tasks.map((task) => (
-          <li key={task.id}>
-            <strong>{task.title}</strong> - {task.course}
-          </li>
+          <option key={task.id} value={task.id}>
+            {task.title} - {task.course}
+          </option>
         ))}
-      </ul>
+      </select>
       <h2>Zadanie Poczty</h2>
       <p>Odbiorca: {emailTask.recipient}</p>
       <p>Treść: {emailTask.message}</p>
-      <input
-        type="text"
-        placeholder="Wpisz odbiorcę"
+      <select
         value={recipient}
         onChange={(e) => setRecipient(e.target.value)}
-        className={styles.input}
-      />
+        className={styles.select}
+      >
+        <option value="">Wybierz odbiorcę</option>
+        <option value="Jan Kowalski">Jan Kowalski</option>
+        <option value="Anna Nowak">Anna Nowak</option>
+        <option value="Piotr Wiśniewski">Piotr Wiśniewski</option>
+      </select>
       <textarea
         placeholder="Wpisz treść wiadomości"
         value={message}

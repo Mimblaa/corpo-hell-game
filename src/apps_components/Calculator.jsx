@@ -35,13 +35,14 @@ const Calculator = ({ tasks }) => {
       </button>
       {feedback && <p className={styles.feedback}>{feedback}</p>}
       <h3>Zadania związane z Kalkulatorem</h3>
-      <ul>
+      <select className={styles.select}>
+        <option value="">Wybierz zadanie</option>
         {tasks.map((task) => (
-          <li key={task.id}>
-            <strong>{task.title}</strong> - {task.course}
-          </li>
+          <option key={task.id} value={task.id}>
+            {task.title} - {task.course}
+          </option>
         ))}
-      </ul>
+      </select>
     </>
   );
 };
