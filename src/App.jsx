@@ -9,8 +9,14 @@ function App() {
   const [isAppVisible, setIsAppVisible] = useState(false);
 
     const defaultChats = [
-      { id: 1, name: "Group Chat" },
-      { id: 2, name: "New Chat 2" },
+      { 
+        id: 1, 
+        name: "Group Chat" 
+      },
+      { 
+        id: 2, 
+        name: "New Chat 2" 
+      },
     ];
   
     const defaultMessages = [
@@ -127,6 +133,51 @@ function App() {
       },
   ];
 
+  const defaultCalls = [
+    { 
+      id: 1, 
+      name: "Jan Kowalski", 
+      time: "2023-11-01 14:30", 
+      type: "outgoing",
+      scenario: {"id":4,"text":"Nie miałem jeszcze czasu się tym zająć…","effect":"+5 Autentyczność","penalty":"-10 Reputacja"},
+      rating: {"effect":"+5 Autentyczność","penalty":"-10 Reputacja"} 
+    },
+    { 
+      id: 2, 
+      name: "Anna Nowak", 
+      time: "2023-11-02 10:15", 
+      type: "incoming" ,
+      scenario: {"id":4,"text":"Nie miałem jeszcze czasu się tym zająć…","effect":"+5 Autentyczność","penalty":"-10 Reputacja"},
+      rating: {"effect":"+5 Autentyczność","penalty":"-10 Reputacja"}
+    },
+    { 
+      id: 3, 
+      name: "Piotr Wiśniewski", 
+      time: "2023-11-03 16:45", 
+      type: "missed",
+      scenario: {"id":4,"text":"Nie miałem jeszcze czasu się tym zająć…","effect":"+5 Autentyczność","penalty":"-10 Reputacja"},
+      rating: {"effect":"+5 Autentyczność","penalty":"-10 Reputacja"} 
+    },
+  ];
+
+  const defaultContacts = [
+    { 
+      id: 1, 
+      name: "Jan Kowalski" 
+    },
+    { 
+      id: 2, 
+      name: "Anna Nowak" 
+    },
+    { 
+      id: 3, 
+      name: "Piotr Wiśniewski" 
+    },
+    { 
+      id: 4, 
+      name: "Maria Zielińska" 
+    },
+  ];
 
   const handleStartClick = () => {
     // Reset localStorage to default values
@@ -140,6 +191,9 @@ function App() {
     localStorage.setItem("isModalOpen", "false");
     localStorage.setItem("modalContent", null);
     localStorage.setItem("currentDate", new Date().toISOString());
+    localStorage.setItem("callHistory", JSON.stringify(defaultCalls));
+    localStorage.setItem("callFilter", "all");
+    localStorage.setItem("contacts", JSON.stringify(defaultContacts));
 
     setIsAppVisible(true);
   };

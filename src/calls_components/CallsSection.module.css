@@ -1,0 +1,246 @@
+.callsSection {
+  padding: 16px;
+  background-color: #f5f5f5;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.callList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.callItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.callItem:last-child {
+  border-bottom: none;
+}
+
+.callName {
+  font-weight: bold;
+  color: #333;
+  text-align: left;
+}
+
+.callTime {
+  color: #666;
+  text-align: center;
+}
+
+.callType {
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: capitalize;
+  text-align: center;
+}
+
+.outgoing {
+  background-color: #e0f7fa;
+  color: #00796b;
+}
+
+.incoming {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.missed {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.filterLabel {
+  margin-right: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.filterSelect {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.deleteButton {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: right;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteButton:hover {
+  background-color: #b71c1c;
+}
+
+.deleteIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.emptyState {
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.startCallButton {
+  background-color: #388e3c;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.startCallButton:hover {
+  background-color: #2e7d32;
+}
+
+.activeCall {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.activeCallSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 16px;
+  background-color: #f9f9f9;
+}
+
+.videoPlaceholder {
+  width: 100%;
+  height: 300px;
+  background-color: #ddd;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #666;
+}
+
+.endCallButton {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.endCallButton:hover {
+  background-color: #b71c1c;
+}
+
+.callControls {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.controlButton {
+  background-color: #388e3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.controlButton:hover {
+  background-color: #2e7d32;
+}
+
+.contactsTitle,
+.historyTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.contactsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contactItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.contactItem:last-child {
+  border-bottom: none;
+}
+
+.contactName {
+  font-weight: bold;
+  color: #333;
+}
+
+.callListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 12px;
+  font-weight: bold;
+  background-color: #e0e0e0;
+  border-bottom: 1px solid #ddd;
+}
+
+.callActions {
+  text-align: right;
+  color: #333;
+}
