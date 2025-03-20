@@ -51,54 +51,61 @@ const Drawing = ({ tasks, setTasks }) => {
   };
 
   return (
-    <>
-      <h3>Zadania związane z Grafiką</h3>
-      {!selectedTask ? (
-        <>
-          <select
-            className={styles.select}
-            onChange={(e) => {
-              const selectedId = e.target.value;
-              if (selectedId) {
-                setSelectedTask(tasks.find((task) => task.id.toString() === selectedId));
-              }
-            }}
-          >
-            <option value="">Wybierz zadanie</option>
-            {tasks.map((task) => (
-              <option key={task.id} value={task.id}>
-                {task.title} - {task.course}
-              </option>
-            ))}
-          </select>
-        </>
-      ) : (
-        <>
-          <h2>Zadanie Grafiki</h2>
-          <p>{selectedTask.title}</p>
-          <canvas
-            ref={canvasRef}
-            width={400}
-            height={canvasHeight} // Use dynamic height
-            className={styles.canvas}
-            onMouseDown={handleCanvasMouseDown}
-            onMouseMove={handleCanvasMouseMove}
-            onMouseUp={handleCanvasMouseUp}
-          />
-          <button onClick={handleSubmit} className={styles.submitButton}>
-            Akceptuj
-          </button>
-          {feedback && (
-            <>
-              <p className={styles.feedback}>{feedback}</p>
-              <button onClick={handleClose} className={styles.closeButton}>
-                Zamknij
-              </button>
-            </>
-          )}
-        </>
-      )}
-    </>
+    <div className={styles.drawingContainer}>
+      <div className={styles.scrollableContent}>
+        {!selectedTask ? (
+          <>
+            <h3 className={styles.drawingSubtitle}>Zadania związane z Grafiką</h3>
+            <select
+              className={`${styles.select} ${styles.enhancedSelect}`}
+              onChange={(e) => {
+                const selectedId = e.target.value;
+                if (selectedId) {
+                  setSelectedTask(tasks.find((task) => task.id.toString() === selectedId));
+                }
+              }}
+            >
+              <option value="">Wybierz zadanie</option>
+              {tasks.map((task) => (
+                <option key={task.id} value={task.id}>
+                  {task.title} - {task.course}
+                </option>
+              ))}
+            </select>
+          </>
+        ) : (
+          <>
+            {selectedTask && (
+              <div className={`${styles.taskDetails} ${styles.enhancedTaskDetails}`}>
+                <h4 className={styles.taskTitle}>Wybrane zadanie:</h4>
+                <p><strong>Tytuł:</strong> {selectedTask.title}</p>
+                <p><strong>Opis:</strong> {selectedTask.description}</p>
+              </div>
+            )}
+            <canvas
+              ref={canvasRef}
+              width={400}
+              height={canvasHeight}
+              className={styles.canvas}
+              onMouseDown={handleCanvasMouseDown}
+              onMouseMove={handleCanvasMouseMove}
+              onMouseUp={handleCanvasMouseUp}
+            />
+            <button onClick={handleSubmit} className={`${styles.submitButton} ${styles.enhancedButton}`}>
+              Akceptuj
+            </button>
+            {feedback && (
+              <>
+                <p className={`${styles.feedback} ${styles.enhancedFeedback}`}>{feedback}</p>
+                <button onClick={handleClose} className={`${styles.closeButton} ${styles.enhancedButton}`}>
+                  Zamknij
+                </button>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 

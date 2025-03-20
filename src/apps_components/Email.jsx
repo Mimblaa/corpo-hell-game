@@ -9,15 +9,19 @@ const Email = ({ tasks, setTasks }) => {
   const [recipient, setRecipient] = useState("");
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [selectedTask, setSelectedTask] = useState("");
+  const [selectedTask, setSelectedTask] = useState(null);
   const [showTask, setShowTask] = useState(false);
 
   const handleSubmit = () => {
-    if (selectedTask && recipient === emailTask.recipient && message === emailTask.message) {
+    if (
+      selectedTask &&
+      recipient === emailTask.recipient &&
+      message === emailTask.message
+    ) {
       setFeedback("Brawo! Mail został poprawnie wysłany.");
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
-          task.id === parseInt(selectedTask) ? { ...task, status: "Ukończone" } : task
+          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
         )
       );
     } else {
@@ -26,71 +30,80 @@ const Email = ({ tasks, setTasks }) => {
   };
 
   const handleTaskSelection = (e) => {
-    setSelectedTask(e.target.value);
-    setShowTask(!!e.target.value);
+    const taskId = parseInt(e.target.value, 10); // Ensure taskId is a number
+    const task = tasks.find((task) => task.id === taskId);
+    setSelectedTask(task);
+    setShowTask(!!task);
     setFeedback(""); // Reset feedback when switching tasks
+    setRecipient("");
+    setMessage("");
   };
 
   const handleCloseFeedback = () => {
     setShowTask(false);
-    setSelectedTask("");
+    setSelectedTask(null);
     setRecipient("");
     setMessage("");
     setFeedback("");
   };
 
   return (
-    <>
-      <h2>Poczta</h2>
-      <p>Wyślij wiadomość e-mail.</p>
-      <h3>Zadania związane z Pocztą</h3>
-      <select
-        className={styles.select}
-        value={selectedTask}
-        onChange={handleTaskSelection}
-      >
-        <option value="">Wybierz zadanie</option>
-        {tasks.map((task) => (
-          <option key={task.id} value={task.id}>
-            {task.title} - {task.course}
-          </option>
-        ))}
-      </select>
-      {showTask && (
-        <>
-          <h2>Zadanie Poczty</h2>
-          <p>Odbiorca: {emailTask.recipient}</p>
-          <p>Treść: {emailTask.message}</p>
-          <select
-            value={recipient}
-            onChange={(e) => setRecipient(e.target.value)}
-            className={styles.select}
-          >
-            <option value="">Wybierz odbiorcę</option>
-            <option value="Jan Kowalski">Jan Kowalski</option>
-            <option value="Anna Nowak">Anna Nowak</option>
-            <option value="Piotr Wiśniewski">Piotr Wiśniewski</option>
-          </select>
-          <textarea
-            placeholder="Wpisz treść wiadomości"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className={styles.textarea}
-          />
-          <button onClick={handleSubmit} className={styles.submitButton}>
-            Akceptuj
-          </button>
-          {feedback && (
-            <>
-              <p className={styles.feedback}>{feedback}</p>
-              <button onClick={handleCloseFeedback} className={styles.closeButton}>
-                Zamknij
-              </button>
-            </>
-          )}
-        </>
-      )}
-    </>
+    <div className={styles.emailContainer}>
+      <div className={styles.scrollableContent}>
+        <h2 className={styles.emailTitle}>Poczta</h2>
+        <h3 className={styles.emailSubtitle}>Zadania związane z Korespondencją</h3>
+        <select
+          className={`${styles.select} ${styles.enhancedSelect}`}
+          onChange={handleTaskSelection}
+          value={selectedTask?.id || ""}
+        >
+          <option value="">Wybierz zadanie</option>
+          {tasks.map((task) => (
+            <option key={task.id} value={task.id}>
+              {task.title} - {task.course}
+            </option>
+          ))}
+        </select>
+        {selectedTask && (
+          <div className={`${styles.taskDetails} ${styles.enhancedTaskDetails}`}>
+            <h4 className={styles.taskTitle}>Wybrane zadanie:</h4>
+            <p><strong>Tytuł:</strong> {selectedTask.title}</p>
+            <p><strong>Kurs:</strong> {selectedTask.course}</p>
+            <p><strong>Opis:</strong> {selectedTask.description}</p>
+          </div>
+        )}
+        {showTask && (
+          <div className={`${styles.emailTask} ${styles.enhancedQuestion}`}>
+            <h2 className={styles.questionTitle}>Zadanie Poczty</h2>
+            <p><strong>Odbiorca:</strong> {emailTask.recipient}</p>
+            <p><strong>Treść:</strong> {emailTask.message}</p>
+            <select
+              value={recipient}
+              onChange={(e) => setRecipient(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">Wybierz odbiorcę</option>
+              <option value="Jan Kowalski">Jan Kowalski</option>
+              <option value="Anna Nowak">Anna Nowak</option>
+              <option value="Piotr Wiśniewski">Piotr Wiśniewski</option>
+            </select>
+            <textarea
+              placeholder="Wpisz treść wiadomości"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className={styles.textarea}
+            />
+            <button onClick={handleSubmit} className={`${styles.submitButton} ${styles.enhancedButton}`}>
+              Wyślij
+            </button>
+            {feedback && <p className={`${styles.feedback} ${styles.enhancedFeedback}`}>{feedback}</p>}
+            <button onClick={handleCloseFeedback} className={`${styles.closeButton} ${styles.enhancedButton}`}>
+              Zamknij zadanie
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

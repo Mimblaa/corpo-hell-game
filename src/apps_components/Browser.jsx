@@ -9,14 +9,22 @@ const Browser = ({ tasks, setTasks }) => {
   });
   const [generalAnswer, setGeneralAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
-  const [selectedTask, setSelectedTask] = useState("");
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const handleTaskSelect = (e) => {
+    const taskId = parseInt(e.target.value, 10);
+    const task = tasks.find((task) => task.id === taskId);
+    setSelectedTask(task);
+    setFeedback("");
+    setGeneralAnswer("");
+  };
 
   const handleSubmit = () => {
-    if (generalAnswer === generalQuestion.answer) {
+    if (selectedTask && generalAnswer === generalQuestion.answer) {
       setFeedback("Brawo! Poprawna odpowiedź.");
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
-          task.id === parseInt(selectedTask) ? { ...task, status: "Ukończone" } : task
+          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
         )
       );
     } else {
@@ -24,56 +32,75 @@ const Browser = ({ tasks, setTasks }) => {
     }
   };
 
-  const handleReset = () => {
-    setSelectedTask("");
+  const handleCloseQuestion = () => {
+    setSelectedTask(null);
     setFeedback("");
+    setGeneralAnswer("");
   };
 
   return (
-    <>
-      <h2>Zadania związane z Internetem</h2>
-      <select
-        className={styles.select}
-        value={selectedTask}
-        onChange={(e) => setSelectedTask(e.target.value)}
-      >
-        <option value="">Wybierz zadanie</option>
-        {tasks.map((task) => (
-          <option key={task.id} value={task.id}>
-            {task.title} - {task.course}
-          </option>
-        ))}
-      </select>
+    <div className={styles.browserContainer}>
+      <div className={styles.scrollableContent}>
+        <h2 className={styles.browserTitle}>Przeglądarka</h2>
+        <h3 className={styles.browserSubtitle}>Zadania związane z Internetem</h3>
 
-      {selectedTask && (
-        <>
-          <h2>Pytanie z wiedzy ogólnej</h2>
-          <p>{generalQuestion.question}</p>
-          <div>
-            {generalQuestion.options.map((option, index) => (
-              <label key={index} className={styles.optionLabel}>
-                <input
-                  type="radio"
-                  name="generalQuestion"
-                  value={option[0]}
-                  onChange={(e) => setGeneralAnswer(e.target.value)}
-                />
-                {option}
-              </label>
-            ))}
+        {/* Task Selection */}
+        <select
+          className={`${styles.select} ${styles.enhancedSelect}`}
+          onChange={handleTaskSelect}
+          value={selectedTask?.id || ""}
+        >
+          <option value="">Wybierz zadanie</option>
+          {tasks.map((task) => (
+            <option key={task.id} value={task.id}>
+              {task.title} - {task.course}
+            </option>
+          ))}
+        </select>
+
+        {/* Task Details */}
+        {selectedTask && (
+          <div className={`${styles.taskDetails} ${styles.enhancedTaskDetails}`}>
+            <h4 className={styles.taskTitle}>Wybrane zadanie:</h4>
+            <p>
+              <strong>Tytuł:</strong> {selectedTask.title}
+            </p>
+            <p>
+              <strong>Opis:</strong> {selectedTask.description}
+            </p>
           </div>
-          <button onClick={handleSubmit} className={styles.submitButton}>
-            Akceptuj
-          </button>
-          {feedback && <p className={styles.feedback}>{feedback}</p>}
-          {feedback && (
-            <button onClick={handleReset} className={styles.resetButton}>
-              Wróć do wyboru zadania
+        )}
+
+        {/* General Knowledge Question */}
+        {selectedTask && (
+          <div className={`${styles.generalQuestion} ${styles.enhancedQuestion}`}>
+            <h2 className={styles.questionTitle}>Pytanie z wiedzy ogólnej</h2>
+            <p className={styles.questionText}>{generalQuestion.question}</p>
+            <div className={styles.optionsContainer}>
+              {generalQuestion.options.map((option, index) => (
+                <label key={index} className={`${styles.optionLabel} ${styles.enhancedOptionLabel}`}>
+                  <input
+                    type="radio"
+                    name="generalQuestion"
+                    value={option[0]}
+                    onChange={(e) => setGeneralAnswer(e.target.value)}
+                    className={styles.radioInput}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
+            <button onClick={handleSubmit} className={`${styles.submitButton} ${styles.enhancedButton}`}>
+              Akceptuj
             </button>
-          )}
-        </>
-      )}
-    </>
+            {feedback && <p className={`${styles.feedback} ${styles.enhancedFeedback}`}>{feedback}</p>}
+            <button onClick={handleCloseQuestion} className={`${styles.closeButton} ${styles.enhancedButton}`}>
+              Zamknij pytanie
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
