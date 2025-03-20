@@ -571,6 +571,12 @@
   padding: 16px 0;
 }
 
+.scrollableContainer {
+  overflow-y: auto;
+  max-height: calc(100vh - 150px); /* Adjust height as needed */
+  padding-bottom: 16px; /* Ensure space for the last item */
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
   .taskGroups {

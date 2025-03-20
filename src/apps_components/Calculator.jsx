@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
 
-const Calculator = () => {
+const Calculator = ({ tasks }) => {
   const generateMathProblem = () => {
     const num1 = Math.floor(Math.random() * 10) + 1;
     const num2 = Math.floor(Math.random() * 10) + 1;
@@ -34,6 +34,14 @@ const Calculator = () => {
         Akceptuj
       </button>
       {feedback && <p className={styles.feedback}>{feedback}</p>}
+      <h3>Zadania związane z Kalkulatorem</h3>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            <strong>{task.title}</strong> - {task.course}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };

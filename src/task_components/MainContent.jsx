@@ -63,18 +63,34 @@ const MainContent = () => {
         priority: "low", 
         tags: ["spotkania"],
       }, 
+      {
+        id: 7,
+        title: "Odpisz klientowi",
+        dueDate: "2023-11-18T14:00:00",
+        course: "Korespondencja",
+        status: "Nie przesłano",
+        priority: "low", 
+        tags: ["mail"],
+      }, 
   ];
 
   const [activeTab, setActiveTab] = useState(TabType.UPCOMING);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem("tasks");
-    return savedTasks ? [...defaultTasks, ...JSON.parse(savedTasks)] : defaultTasks;
+    const combinedTasks = savedTasks
+      ? [...defaultTasks, ...JSON.parse(savedTasks)]
+      : defaultTasks;
+
+    return Array.from(new Map(combinedTasks.map((task) => [task.id, task])).values());
   });
 
   useEffect(() => {
-    // Save tasks to localStorage whenever they change
-    localStorage.setItem("tasks", JSON.stringify(tasks.filter((task) => !defaultTasks.some((dt) => dt.id === task.id))));
+    // Zapisz zadania do localStorage za każdym razem, gdy się zmieniają
+    localStorage.setItem(
+      "tasks",
+      JSON.stringify(tasks.filter((task) => !defaultTasks.some((dt) => dt.id === task.id)))
+    );
   }, [tasks]);
 
   const handleAddTask = (taskData) => {
@@ -132,12 +148,14 @@ const MainContent = () => {
 
   return (
     <section className={styles.mainContent}>
-      <ContentHeader
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onAddTask={() => setIsModalOpen(true)}
-      />
-      {renderContent()}
+      <div className={styles.scrollableContainer}>
+        <ContentHeader
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          onAddTask={() => setIsModalOpen(true)}
+        />
+        {renderContent()}
+      </div>
       <TaskFormModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

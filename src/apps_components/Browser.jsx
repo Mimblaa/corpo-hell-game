@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
 
-const Browser = () => {
+const Browser = ({ tasks }) => {
   const [generalQuestion] = useState({
     question: "Jakie jest największe zwierzę na świecie?",
     answer: "Płetwal błękitny",
@@ -31,6 +31,14 @@ const Browser = () => {
         Akceptuj
       </button>
       {feedback && <p className={styles.feedback}>{feedback}</p>}
+      <h2>Zadania związane z Internetem</h2>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            <strong>{task.title}</strong> - {task.course}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };

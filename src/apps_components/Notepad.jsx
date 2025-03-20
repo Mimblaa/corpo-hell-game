@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
 
-const Notepad = () => {
+const Notepad = ({ tasks }) => {
   const [transcriptionTask] = useState(
     "Przepisz ten tekst dokładnie: 'Witaj w Notatniku!'"
   );
@@ -29,6 +29,14 @@ const Notepad = () => {
         Akceptuj
       </button>
       {feedback && <p className={styles.feedback}>{feedback}</p>}
+      <h3>Zadania związane z Notatkami</h3>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            <strong>{task.title}</strong> - {task.course}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };

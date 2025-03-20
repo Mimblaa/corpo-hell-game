@@ -17,6 +17,7 @@ export const predefinedCourses = [
   "Internet",
   "Notatki",
   "Matematyka",
+  "Korespondencja",
 ];
 
 export const predefinedTags = [
@@ -30,4 +31,5 @@ export const predefinedTags = [
   "matematyka",
   "notatki",
   "spotkania",
+  "mail"
 ];

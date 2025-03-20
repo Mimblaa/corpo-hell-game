@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import styles from "./AppsSection.module.css";
 
-const Drawing = () => {
+const Drawing = ({ tasks }) => {
   const [drawingTask] = useState("Narysuj dom.");
   const [feedback, setFeedback] = useState("");
   const [canvasHeight, setCanvasHeight] = useState(window.innerHeight * 0.3);
@@ -55,6 +55,14 @@ const Drawing = () => {
         Akceptuj
       </button>
       {feedback && <p className={styles.feedback}>{feedback}</p>}
+      <h3>Zadania związane z Grafiką</h3>
+      <ul>
+        {tasks.map((task) => (
+          <li key={task.id}>
+            <strong>{task.title}</strong> - {task.course}
+          </li>
+        ))}
+      </ul>
     </>
   );
 };
