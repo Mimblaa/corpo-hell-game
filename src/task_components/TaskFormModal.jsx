@@ -28,6 +28,15 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+
+    // Pobierz istniejące zadania z localStorage
+    const savedTasks = localStorage.getItem("tasks");
+    const tasks = savedTasks ? JSON.parse(savedTasks) : [];
+
+    // Dodaj nowe zadanie do listy i zapisz w localStorage
+    const updatedTasks = [...tasks, { id: Date.now(), ...formData }];
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+
     setFormData({
       title: "",
       course: "",

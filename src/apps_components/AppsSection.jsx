@@ -15,65 +15,63 @@ import Email from "./Email";
 import Drawing from "./Drawing";
 
 const apps = [
-  { id: 1, name: "Kalkulator", icon: calculatorIcon },
-  { id: 2, name: "Notatnik", icon: notesIcon },
-  { id: 3, name: "Przeglądarka", icon: browserIcon },
-  { id: 4, name: "Poczta", icon: emailIcon },
-  { id: 5, name: "Grafika", icon: artistIcon },
+  { id: 1, name: "Kalkulator", icon: calculatorIcon, component: Calculator, filter: (task) => task.course === "Matematyka" || task.course === "Statystyka" },
+  { id: 2, name: "Notatnik", icon: notesIcon, component: Notepad, filter: (task) => task.course === "Notatki" },
+  { id: 3, name: "Przeglądarka", icon: browserIcon, component: Browser, filter: (task) => task.course === "Internet" },
+  { id: 4, name: "Poczta", icon: emailIcon, component: Email, filter: (task) => task.course === "Poczta" || task.course === "Korespondencja" },
+  { id: 5, name: "Grafika", icon: artistIcon, component: Drawing, filter: (task) => task.course === "Grafika" },
 ];
 
 const AppsSection = () => {
-  const [isModalOpen, setIsModalOpen] = useState(() => {
-    // Load modal state from localStorage or default to false
-    return localStorage.getItem("isModalOpen") === "true";
-  });
-  const [modalContent, setModalContent] = useState(() => {
-    // Load modal content from localStorage or default to null
-    return localStorage.getItem("modalContent") || null;
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("tasks");
+    return savedTasks ? JSON.parse(savedTasks) : [];
   });
 
   useEffect(() => {
-    // Save modal state and content to localStorage whenever they change
-    localStorage.setItem("isModalOpen", isModalOpen);
-    localStorage.setItem("modalContent", modalContent);
-  }, [isModalOpen, modalContent]);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
-  const handleAppClick = (appName) => {
-    setModalContent(appName);
-    setIsModalOpen(true);
+  const filteredTasks = tasks.filter(
+    (task) => task.status === "Nie przesłano" || task.status === "Po terminie"
+  );
+
+  const handleAppClick = (app) => {
+    setSelectedApp(app);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleBackToApps = () => {
+    setSelectedApp(null);
   };
 
   return (
     <section className={styles.appsSection}>
-      <h1 className={styles.title}>Aplikacje</h1>
-      <div className={styles.appsGrid}>
-        {apps.map((app) => (
-          <div
-            key={app.id}
-            className={styles.appCard}
-            onClick={() => handleAppClick(app.name)}
-          >
-            <img src={app.icon} alt={app.name} className={styles.appIcon} />
-            <div className={styles.appName}>{app.name}</div>
+      {!selectedApp ? (
+        <>
+          <h1 className={styles.title}>Aplikacje</h1>
+          <div className={styles.appsGrid}>
+            {apps.map((app) => (
+              <div
+                key={app.id}
+                className={styles.appCard}
+                onClick={() => handleAppClick(app)}
+              >
+                <img src={app.icon} alt={app.name} className={styles.appIcon} />
+                <div className={styles.appName}>{app.name}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      {isModalOpen && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            {modalContent === "Kalkulator" && <Calculator />}
-            {modalContent === "Notatnik" && <Notepad />}
-            {modalContent === "Przeglądarka" && <Browser />}
-            {modalContent === "Poczta" && <Email />}
-            {modalContent === "Grafika" && <Drawing />}
-            <button onClick={closeModal} className={styles.closeButton}>
-              Zamknij
-            </button>
-          </div>
+        </>
+      ) : (
+        <div className={styles.appContent}>
+          <button onClick={handleBackToApps} className={styles.backButton}>
+            Wróć do aplikacji
+          </button>
+          <selectedApp.component
+            tasks={filteredTasks.filter(selectedApp.filter)}
+            setTasks={setTasks} // Pass setTasks here
+          />
         </div>
       )}
     </section>
