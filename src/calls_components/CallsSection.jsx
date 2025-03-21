@@ -42,6 +42,15 @@ const CallsSection = ({ defaultContacts }) => {
     localStorage.setItem("callFilter", filter);
   }, [filter]);
 
+  useEffect(() => {
+    const storedActiveCall = localStorage.getItem("activeCall");
+    if (storedActiveCall) {
+      const activeCallData = JSON.parse(storedActiveCall);
+      handleStartCall(activeCallData);
+      localStorage.removeItem("activeCall");
+    }
+  }, []);
+
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
   };

@@ -8,7 +8,7 @@ import moreOptionsIcon from '../assets/icons/more-options-participants.png';
 import yourAvatar from '../assets/icons/profile-icon.png';
 import participantAvatar from '../assets/icons/user-avatar.png';
 
-const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage }) => {
+const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChangeSection }) => {
   const messageListRef = useRef(null);
   const [isInMeeting, setIsInMeeting] = useState(false);
 
@@ -33,8 +33,11 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage }) => {
   };
 
   const handleStartMeeting = () => {
+    const activeCall = { name: chatName, id: selectedChatId, time: new Date().toISOString() };
+    localStorage.setItem("activeSection", "calls");
+    localStorage.setItem("activeCall", JSON.stringify(activeCall));
     setIsInMeeting(true);
-    alert("Rozpoczynanie spotkania...");
+    onChangeSection("calls");
   };
 
   return (
