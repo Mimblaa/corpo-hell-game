@@ -6,7 +6,7 @@ import ChatContent from "./ChatContent";
 import participantAvatar from '../assets/icons/user-avatar.png';
 import yourAvatar from '../assets/icons/profile-icon.png';
 
-const ChatSection = () => {
+const ChatSection = ({ onChangeSection }) => {
   const [selectedChatId, setSelectedChatId] = useState(() => {
     return parseInt(localStorage.getItem("selectedChatId"), 10) || 1;
   });
@@ -74,6 +74,7 @@ const ChatSection = () => {
         chatName={selectedChat?.name || "Unknown Chat"}
         messages={messages.filter((message) => message.chatId === selectedChatId)}
         onSendMessage={(newMessage) => handleSendMessage(selectedChatId, newMessage)}
+        onChangeSection={onChangeSection}
       />
     </>
   );

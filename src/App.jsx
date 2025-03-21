@@ -8,6 +8,20 @@ import yourAvatar from './assets/icons/profile-icon.png';
 function App() {
   const [isAppVisible, setIsAppVisible] = useState(false);
 
+  const scenarios = [
+    {
+      name: "Strategiczne Spotkanie Statusowe",
+      question: "Jak wygląda postęp w tym projekcie? Mam nadzieję, że wszystko idzie zgodnie z planem.",
+      options: [
+        { id: 1, text: "Tak, wszystko zgodnie z harmonogramem!", effect: "+5 Reputacja", penalty: "-5 Zaufanie Szefa" },
+        { id: 2, text: "Jeszcze nad tym pracujemy, ale są pewne wyzwania...", effect: "+3 Unikanie Odpowiedzialności", penalty: "-2 Zaufanie Szefa" },
+        { id: 3, text: "Mieliśmy problem z priorytetami, ale to pod kontrolą.", effect: "+4 Polityczny Spryt", penalty: "-4 Zaufanie Zespołu" },
+        { id: 4, text: "Nie miałem jeszcze czasu się tym zająć…", effect: "+5 Autentyczność", penalty: "-10 Reputacja" },
+        { id: 5, text: "Udawaj problemy techniczne i zniknij z calla", effect: "+10 Cwaniactwo", penalty: "-5 Zaufanie Szefa, -3 Zaufanie Zespołu" },
+      ],
+    },
+  ];
+
     const defaultChats = [
       { 
         id: 1, 
@@ -194,6 +208,7 @@ function App() {
     localStorage.setItem("callHistory", JSON.stringify(defaultCalls));
     localStorage.setItem("callFilter", "all");
     localStorage.setItem("contacts", JSON.stringify(defaultContacts));
+    localStorage.setItem("scenarios", JSON.stringify(scenarios)); // Save scenarios to localStorage
 
     setIsAppVisible(true);
   };

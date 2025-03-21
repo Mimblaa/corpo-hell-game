@@ -29,19 +29,10 @@ const CallsSection = ({ defaultContacts }) => {
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [selectedScenarioOption, setSelectedScenarioOption] = useState(null);
 
-  const scenarios = [
-    {
-      name: "Strategiczne Spotkanie Statusowe",
-      question: "Jak wygląda postęp w tym projekcie? Mam nadzieję, że wszystko idzie zgodnie z planem.",
-      options: [
-        { id: 1, text: "Tak, wszystko zgodnie z harmonogramem!", effect: "+5 Reputacja", penalty: "-5 Zaufanie Szefa" },
-        { id: 2, text: "Jeszcze nad tym pracujemy, ale są pewne wyzwania...", effect: "+3 Unikanie Odpowiedzialności", penalty: "-2 Zaufanie Szefa" },
-        { id: 3, text: "Mieliśmy problem z priorytetami, ale to pod kontrolą.", effect: "+4 Polityczny Spryt", penalty: "-4 Zaufanie Zespołu" },
-        { id: 4, text: "Nie miałem jeszcze czasu się tym zająć…", effect: "+5 Autentyczność", penalty: "-10 Reputacja" },
-        { id: 5, text: "Udawaj problemy techniczne i zniknij z calla", effect: "+10 Cwaniactwo", penalty: "-5 Zaufanie Szefa, -3 Zaufanie Zespołu" },
-      ],
-    },
-  ];
+  const [scenarios, setScenarios] = useState(() => {
+    const savedScenarios = localStorage.getItem("scenarios");
+    return savedScenarios ? JSON.parse(savedScenarios) : [];
+  });
 
   useEffect(() => {
     localStorage.setItem("callHistory", JSON.stringify(callHistory));
@@ -50,6 +41,15 @@ const CallsSection = ({ defaultContacts }) => {
   useEffect(() => {
     localStorage.setItem("callFilter", filter);
   }, [filter]);
+
+  useEffect(() => {
+    const storedActiveCall = localStorage.getItem("activeCall");
+    if (storedActiveCall) {
+      const activeCallData = JSON.parse(storedActiveCall);
+      handleStartCall(activeCallData);
+      localStorage.removeItem("activeCall");
+    }
+  }, []);
 
   const handleFilterChange = (e) => {
     setFilter(e.target.value);
@@ -107,7 +107,7 @@ const CallsSection = ({ defaultContacts }) => {
       : callHistory.filter((call) => call.type === filter);
 
   if (activeCall) {
-    const scenario = scenarios[0]; // Example scenario
+    const scenario = scenarios.length > 0 ? scenarios[0] : null;
     return (
       <section className={styles.activeCallSection}>
         <h2>Rozmowa z {activeCall.name}</h2>
@@ -118,7 +118,7 @@ const CallsSection = ({ defaultContacts }) => {
               <p><strong>Efekt:</strong> {selectedScenarioOption.effect}</p>
               <p><strong>Kara:</strong> {selectedScenarioOption.penalty}</p>
             </div>
-          ) : (
+          ) : scenario ? (
             <>
               <p>{scenario.question}</p>
               <ul className={styles.scenarioOptions}>
@@ -134,6 +134,8 @@ const CallsSection = ({ defaultContacts }) => {
                 ))}
               </ul>
             </>
+          ) : (
+            <p>Brak dostępnych scenariuszy.</p>
           )}
         </div>
         <div className={styles.callControls}>

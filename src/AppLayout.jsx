@@ -12,8 +12,8 @@ import styles from "./AppLayout.module.css";
 
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState(() => {
-    // Load active section from localStorage or default to "chat"
-    return localStorage.getItem("activeSection") || "chat";
+    const storedSection = localStorage.getItem("activeSection");
+    return storedSection || "chat";
   });
   const [searchQuery, setSearchQuery] = useState(() => {
     // Load search query from localStorage or default to an empty string
@@ -37,7 +37,7 @@ const AppLayout = () => {
   const renderContent = () => {
     switch (activeSection) {
       case "chat":
-        return <ChatSection />;
+        return <ChatSection onChangeSection={handleSectionChange} />;
       case "calendar":
         return <CalendarSection searchQuery={searchQuery} />;
       case "tasks":
