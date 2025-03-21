@@ -193,6 +193,19 @@ function App() {
     },
   ];
 
+  const defaultStats = {
+    reputation: 50,
+    bossTrust: 50,
+    teamTrust: 50,
+    efficiency: 50,
+    politicalSkill: 30,
+    responsibilityAvoidance: 30,
+    buzzwordPower: 30,
+    stress: 20,
+    patience: 80,
+    productivityTheatre: 40,
+  };
+
   const handleStartClick = () => {
     // Reset localStorage to default values
     localStorage.clear();
@@ -209,6 +222,7 @@ function App() {
     localStorage.setItem("callFilter", "all");
     localStorage.setItem("contacts", JSON.stringify(defaultContacts));
     localStorage.setItem("scenarios", JSON.stringify(scenarios)); // Save scenarios to localStorage
+    localStorage.setItem("playerStats", JSON.stringify(defaultStats)); // Save default stats to localStorage
 
     setIsAppVisible(true);
   };
