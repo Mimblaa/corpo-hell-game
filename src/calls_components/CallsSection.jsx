@@ -66,15 +66,46 @@ const CallsSection = ({ defaultContacts }) => {
 
   const handleEndCall = () => {
     if (activeCall) {
+      const updatedStats = { ...JSON.parse(localStorage.getItem("playerStats")) };
+
+      if (selectedScenarioOption) {
+        const effectValue = parseInt(selectedScenarioOption.effect.match(/[-+]?\d+/)[0], 10);
+        const penaltyValue = parseInt(selectedScenarioOption.penalty.match(/[-+]?\d+/)[0], 10);
+
+        const statMapping = {
+          "Reputacja": "reputation",
+          "Zaufanie Szefa": "bossTrust",
+          "Zaufanie Zespołu": "teamTrust",
+          "Polityczny Spryt": "politicalSkill",
+          "Unikanie Odpowiedzialności": "responsibilityAvoidance",
+          "Cwaniactwo": "buzzwordPower",
+          "Stres": "stress",
+          "Cierpliwość": "patience",
+          "Autentyczność": "reputation",
+          "Produktywność Teatralna": "productivityTheatre",
+        };
+
+        Object.keys(statMapping).forEach((key) => {
+          if (selectedScenarioOption.effect.includes(key)) {
+            updatedStats[statMapping[key]] += effectValue;
+          }
+          if (selectedScenarioOption.penalty.includes(key)) {
+            updatedStats[statMapping[key]] += penaltyValue;
+          }
+        });
+      }
+
+      localStorage.setItem("playerStats", JSON.stringify(updatedStats));
+
       setCallHistory((prevHistory) => [
         ...prevHistory,
         {
           ...activeCall,
-          id: Date.now(), // Unikalne ID rozmowy
+          id: Date.now(),
           scenario: selectedScenarioOption || { text: "Brak scenariusza" },
           rating: selectedScenarioOption
             ? { effect: selectedScenarioOption.effect, penalty: selectedScenarioOption.penalty }
-            : { effect: "Brak oceny", penalty: "Brak kary" }, // Save both effect and penalty
+            : { effect: "Brak oceny", penalty: "Brak kary" },
         },
       ]);
     }
@@ -107,7 +138,13 @@ const CallsSection = ({ defaultContacts }) => {
       : callHistory.filter((call) => call.type === filter);
 
   if (activeCall) {
-    const scenario = scenarios.length > 0 ? scenarios[0] : null;
+    const scenario =
+      scenarios.length > 1
+        ? scenarios[Math.floor(Math.random() * scenarios.length)]
+        : scenarios.length === 1
+        ? scenarios[0]
+        : null;
+
     return (
       <section className={styles.activeCallSection}>
         <h2>Rozmowa z {activeCall.name}</h2>

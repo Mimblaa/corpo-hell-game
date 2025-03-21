@@ -20,6 +20,28 @@ function App() {
         { id: 5, text: "Udawaj problemy techniczne i zniknij z calla", effect: "+10 Cwaniactwo", penalty: "-5 Zaufanie Szefa, -3 Zaufanie Zespołu" },
       ],
     },
+    {
+      name: "Niezapowiedziany Call z Szefem",
+      question: "Hej, mamy chwilę? Chciałem szybko omówić twoją ostatnią pracę.",
+      options: [
+        { id: 1, text: "Oczywiście, zawsze mam czas!", effect: "+5 Reputacja", penalty: "+5 Stres" },
+        { id: 2, text: "Czy możemy przełożyć? Jestem w trakcie czegoś ważnego.", effect: "+3 Unikanie Odpowiedzialności", penalty: "-3 Zaufanie Szefa" },
+        { id: 3, text: "Tak, ale czy mógłbyś sprecyzować temat?", effect: "+4 Polityczny Spryt", penalty: "+2 Stres" },
+        { id: 4, text: "*Brak reakcji, udawaj, że nie widziałeś zaproszenia*", effect: "+5 Cwaniactwo", penalty: "-5 Zaufanie Szefa" },
+        { id: 5, text: "*Udawaj problemy z internetem i rozłącz się*", effect: "+7 Unikanie Odpowiedzialności", penalty: "-4 Zaufanie Szefa, -3 Zaufanie Zespołu" },
+      ],
+    },
+    {
+      name: "Mail od HR o Dobrowolnych Nadgodzinach",
+      question: "Czy chcesz poświęcić dodatkowy czas dla dobra zespołu?",
+      options: [
+        { id: 1, text: "Oczywiście! Zostanę, żeby pomóc firmie.", effect: "+7 Reputacja", penalty: "+10 Stres, -5 Cierpliwość" },
+        { id: 2, text: "Nie mogę, mam już inne zobowiązania.", effect: "+4 Autentyczność", penalty: "-3 Reputacja" },
+        { id: 3, text: "Czy będzie za to dodatkowa premia?", effect: "+5 Polityczny Spryt", penalty: "-4 Zaufanie Szefa" },
+        { id: 4, text: "*Nie odpowiadaj, może zapomną*", effect: "+6 Cwaniactwo", penalty: "-5 Zaufanie Zespołu" },
+        { id: 5, text: "*Zaproponuj, że pomożesz, ale tylko w zamian za dodatkowe benefity*", effect: "+5 Unikanie Odpowiedzialności", penalty: "-3 Zaufanie Szefa, +2 Polityczny Spryt" },
+      ],
+    },
   ];
 
     const defaultChats = [
@@ -193,6 +215,19 @@ function App() {
     },
   ];
 
+  const defaultStats = {
+    reputation: 50,
+    bossTrust: 50,
+    teamTrust: 50,
+    efficiency: 50,
+    politicalSkill: 30,
+    responsibilityAvoidance: 30,
+    buzzwordPower: 30,
+    stress: 20,
+    patience: 80,
+    productivityTheatre: 40,
+  };
+
   const handleStartClick = () => {
     // Reset localStorage to default values
     localStorage.clear();
@@ -209,6 +244,7 @@ function App() {
     localStorage.setItem("callFilter", "all");
     localStorage.setItem("contacts", JSON.stringify(defaultContacts));
     localStorage.setItem("scenarios", JSON.stringify(scenarios)); // Save scenarios to localStorage
+    localStorage.setItem("playerStats", JSON.stringify(defaultStats)); // Save default stats to localStorage
 
     setIsAppVisible(true);
   };
