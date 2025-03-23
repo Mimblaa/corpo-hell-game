@@ -3,14 +3,14 @@ import React from "react";
 import styles from "./CalendarApp.module.css";
 import DayColumn from "./DayColumn";
 
-const DAYS = ["poniedziałek", "wtorek", "środa", "czwartek", "piątek"];
+const DAYS = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
 
 const DaysGrid = ({ dates, events, onEditEvent }) => {
   const today = new Date();
 
   return (
     <div className={styles.daysGrid}>
-      {dates.map((date, index) => {
+      {dates.map((date) => {
         const formattedDate = new Date(date);
         const isToday =
           today.getFullYear() === formattedDate.getFullYear() &&
@@ -28,14 +28,13 @@ const DaysGrid = ({ dates, events, onEditEvent }) => {
 
         return (
           <DayColumn
-            key={formattedDate.getTime()} // Unikalny klucz
+            key={formattedDate.getTime()} // Unique key
             date={formattedDate}
             number={formattedDate.getDate()}
-            name={DAYS[index]}
-            active={index === 0}
+            name={DAYS[formattedDate.getDay()]} // Dynamically calculate the day name
             className={isToday ? styles.currentDay : ""} // Add currentDay class
             events={filteredEvents}
-            onEditEvent={onEditEvent} // Przekazujemy funkcję onEditEvent
+            onEditEvent={onEditEvent} // Pass onEditEvent function
           />
         );
       })}

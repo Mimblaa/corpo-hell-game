@@ -8,8 +8,8 @@ import { EventModal } from "./EventModal";
 import { useEvents } from "./EventContext";
 
 const getFirstDayOfWeek = (date) => {
-  const dayOfWeek = date.getDay() || 7; // Treat Sunday (0) as the last day of the week (7)
-  const diff = date.getDate() - dayOfWeek + 1; // Adjust to Monday as the first day of the week
+  const dayOfWeek = date.getDay() || 7;
+  const diff = date.getDate() - dayOfWeek + 1;
   return new Date(date.setDate(diff));
 };
 
@@ -17,14 +17,13 @@ const MainContent = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(() => {
-    // Load current date from localStorage or default to today
     const savedDate = localStorage.getItem("currentDate");
     return savedDate ? new Date(savedDate) : new Date();
   });
+  const [view, setView] = useState("Tydzień roboczy"); // Default view
   const events = useEvents();
 
   useEffect(() => {
-    // Save current date to localStorage whenever it changes
     localStorage.setItem("currentDate", currentDate.toISOString());
   }, [currentDate]);
 
@@ -34,45 +33,55 @@ const MainContent = () => {
   };
 
   const handleNewEvent = () => {
-    setSelectedEvent(null); // Pass null for new events
+    setSelectedEvent(null);
     setIsModalOpen(true);
   };
 
   const handleEditEvent = (event) => {
-    setSelectedEvent(event); // Set the selected event for editing
-    setIsModalOpen(true); // Open the modal
+    setSelectedEvent(event);
+    setIsModalOpen(true);
   };
 
-  const handlePrevWeek = () => {
+  const handlePrev = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() - 7); // Move back 7 days
+    if (view === "Dzień") {
+      newDate.setDate(currentDate.getDate() - 1); // Move back 1 day
+    } else {
+      newDate.setDate(currentDate.getDate() - 7); // Move back 1 week
+    }
     setCurrentDate(newDate);
   };
 
-  const handleNextWeek = () => {
+  const handleNext = () => {
     const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + 7); // Move forward 7 days
+    if (view === "Dzień") {
+      newDate.setDate(currentDate.getDate() + 1); // Move forward 1 day
+    } else {
+      newDate.setDate(currentDate.getDate() + 7); // Move forward 1 week
+    }
     setCurrentDate(newDate);
   };
 
   const handleToday = () => {
-    setCurrentDate(new Date()); // Set the current week to today's date
+    setCurrentDate(new Date());
   };
 
-  const firstDayOfWeek = getFirstDayOfWeek(currentDate);
+  const displayedDate = view === "Dzień" ? currentDate : getFirstDayOfWeek(currentDate);
 
   return (
     <section className={styles.mainContent}>
       <CalendarHeader onNewEvent={handleNewEvent} />
       <CalendarToolbar
-        onPrevWeek={handlePrevWeek}
-        onNextWeek={handleNextWeek}
+        onPrevWeek={handlePrev} // Use handlePrev for navigation
+        onNextWeek={handleNext} // Use handleNext for navigation
         onToday={handleToday}
-        currentWeek={firstDayOfWeek}
+        currentWeek={displayedDate} // Pass the correct date based on the view
+        onViewChange={setView} // Pass view change handler
       />
       <CalendarGrid
         currentDate={currentDate}
         onEventClick={handleEditEvent}
+        view={view} // Pass selected view
       />
       {isModalOpen && <EventModal event={selectedEvent} onClose={handleCloseModal} />}
     </section>

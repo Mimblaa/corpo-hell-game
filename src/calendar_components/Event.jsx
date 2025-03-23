@@ -12,8 +12,10 @@ export const Event = ({ event, onDoubleClick }) => {
     }),
   });
 
+  const localStartTime = new Date(event.startTime.getTime() - event.startTime.getTimezoneOffset() * 60000);
   const minutesFromMidnight =
-    event.startTime.getHours() * 60 + event.startTime.getMinutes();
+    localStartTime.getHours() * 60 +
+    localStartTime.getMinutes();
   const durationMinutes =
     (event.endTime - event.startTime) / (1000 * 60); // Przeliczenie z ms na minuty
 
@@ -31,7 +33,7 @@ export const Event = ({ event, onDoubleClick }) => {
     >
       <h3 className={styles.eventTitle}>{event.title}</h3>
       <p className={styles.eventTime}>
-        {event.startTime.toLocaleTimeString([], {
+        {new Date(event.startTime).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         })}

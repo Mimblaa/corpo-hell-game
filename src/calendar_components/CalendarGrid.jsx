@@ -4,29 +4,40 @@ import TimeColumn from "./TimeColumn";
 import DaysGrid from "./DaysGrid";
 import { useEvents } from "./EventContext";
 
-const CalendarGrid = ({ currentDate, onEventClick }) => {
+const CalendarGrid = ({ currentDate, onEventClick, view }) => {
   const events = useEvents();
 
-  // Get current week dates based on currentDate prop
-  const getCurrentWeekDates = () => {
+  const getDatesForView = () => {
+    if (view === "Dzień") {
+      return [currentDate]; // Use the exact currentDate for the "Dzień" view
+    }
+
     const dayOfWeek = currentDate.getDay();
     const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const monday = new Date(currentDate);
     monday.setDate(monday.getDate() + mondayOffset);
 
-    return Array.from({ length: 5 }, (_, i) => {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + i);
-      return date;
-    });
+    if (view === "Tydzień roboczy") {
+      return Array.from({ length: 5 }, (_, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return date;
+      });
+    } else if (view === "Tydzień") {
+      return Array.from({ length: 7 }, (_, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      });
+    }
   };
 
-  const weekDates = React.useMemo(() => getCurrentWeekDates(), [currentDate]);
+  const dates = React.useMemo(() => getDatesForView(), [currentDate, view]);
 
   return (
     <div className={styles.calendarGrid}>
       <TimeColumn />
-      <DaysGrid dates={weekDates} events={events} onEditEvent={onEventClick} />
+      <DaysGrid dates={dates} events={events} onEditEvent={onEventClick} />
     </div>
   );
 };
