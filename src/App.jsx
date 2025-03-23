@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
-import AppLayout from './AppLayout';
-import './App.css';
+import React, { useState } from "react";
+import AppLayout from "./AppLayout";
+import Questionnaire from "./Questionnaire";
+import "./App.css";
 
 import participantAvatar from './assets/icons/user-avatar.png';
 import yourAvatar from './assets/icons/profile-icon.png';
 
 function App() {
   const [isAppVisible, setIsAppVisible] = useState(false);
+  const [isQuestionnaireComplete, setIsQuestionnaireComplete] = useState(() => {
+    return !!localStorage.getItem("playerStats");
+  });
 
   const scenarios = [
     {
@@ -238,6 +242,126 @@ function App() {
     productivityTheatre: 40,
   };
 
+  const questionnaireData = [
+    {
+      id: "professional",
+      name: "Profesjonalne Umiejętności",
+      questions: [
+        {
+          id: "coffee",
+          text: "Jak pijesz kawę?",
+          options: [
+            { value: "black", text: "Czarna", effects: { reputation: 5 } },
+            { value: "milk", text: "Z mlekiem", effects: { patience: 5 } }
+          ]
+        },
+        {
+          id: "meeting",
+          text: "Co robisz na spotkaniach?",
+          options: [
+            { value: "talk", text: "Dużo mówię", effects: { bossTrust: 5 } },
+            { value: "listen", text: "Słucham", effects: { teamTrust: 5 } }
+          ]
+        },
+        {
+          id: "deadlines",
+          text: "Jak radzisz sobie z terminami?",
+          options: [
+            { value: "crunch", text: "Pracuję na ostatnią chwilę", effects: { stress: 10 } },
+            { value: "plan", text: "Planuję z wyprzedzeniem", effects: { efficiency: 5 } }
+          ]
+        }
+      ]
+    },
+    {
+      id: "cunning",
+      name: "Korpo Cwaniactwo",
+      questions: [
+        {
+          id: "buzzwords",
+          text: "Czy używasz korporacyjnych buzzwordów?",
+          options: [
+            { value: "yes", text: "Tak", effects: { buzzwordPower: 10 } },
+            { value: "no", text: "Nie", effects: { authenticity: 5 } }
+          ]
+        },
+        {
+          id: "responsibility",
+          text: "Jak podchodzisz do odpowiedzialności?",
+          options: [
+            { value: "delegate", text: "Deleguję", effects: { responsibilityAvoidance: 10 } },
+            { value: "take", text: "Biorę na siebie", effects: { efficiency: 5 } }
+          ]
+        },
+        {
+          id: "politics",
+          text: "Jak radzisz sobie z polityką w pracy?",
+          options: [
+            { value: "network", text: "Buduję sieć kontaktów", effects: { politicalSkill: 10 } },
+            { value: "avoid", text: "Unikam polityki", effects: { teamTrust: 5 } }
+          ]
+        }
+      ]
+    },
+    {
+      id: "mental",
+      name: "Mentalność Gracza",
+      questions: [
+        {
+          id: "stressHandling",
+          text: "Jak radzisz sobie ze stresem?",
+          options: [
+            { value: "meditate", text: "Medytuję", effects: { stress: -5 } },
+            { value: "ignore", text: "Ignoruję", effects: { stress: 5 } }
+          ]
+        },
+        {
+          id: "multitasking",
+          text: "Czy jesteś dobry w multitaskingu?",
+          options: [
+            { value: "yes", text: "Tak", effects: { efficiency: 5 } },
+            { value: "no", text: "Nie", effects: { patience: 5 } }
+          ]
+        },
+        {
+          id: "productivity",
+          text: "Jak mierzysz swoją produktywność?",
+          options: [
+            { value: "visible", text: "Widoczna produktywność", effects: { productivityTheatre: 10 } },
+            { value: "actual", text: "Rzeczywista produktywność", effects: { efficiency: 5 } }
+          ]
+        }
+      ]
+    },
+    {
+      id: "personal",
+      name: "Osobiste Preferencje",
+      questions: [
+        {
+          id: "workEnvironment",
+          text: "Jakie środowisko pracy preferujesz?",
+          options: [
+            { value: "quiet", text: "Ciche i spokojne", effects: { patience: 5 } },
+            { value: "dynamic", text: "Dynamiczne i szybkie", effects: { stress: 5 } }
+          ]
+        },
+        {
+          id: "feedback",
+          text: "Jak reagujesz na krytykę?",
+          options: [
+            { value: "accept", text: "Akceptuję i uczę się", effects: { reputation: 5 } },
+            { value: "defensive", text: "Bronię się", effects: { stress: 5 } }
+          ]
+        }
+      ]
+    }
+  ];
+
+  const handleQuestionnaireComplete = () => {
+    setIsQuestionnaireComplete(true);
+    setIsAppVisible(true);
+  };
+
   const handleStartClick = () => {
     // Reset localStorage to default values
     localStorage.clear();
@@ -254,9 +378,9 @@ function App() {
     localStorage.setItem("callFilter", "all");
     localStorage.setItem("contacts", JSON.stringify(defaultContacts));
     localStorage.setItem("scenarios", JSON.stringify(scenarios)); // Save scenarios to localStorage
-    localStorage.setItem("playerStats", JSON.stringify(defaultStats)); // Save default stats to localStorage
+    localStorage.setItem("questionnaireData", JSON.stringify(questionnaireData)); // Save questionnaire data to localStorage
 
-    setIsAppVisible(true);
+    setIsQuestionnaireComplete(false); // Trigger questionnaire
   };
 
   const handleContinueClick = () => {
@@ -264,13 +388,18 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className={isAppVisible ? "app-container" : "start-page"}>
       {!isAppVisible ? (
-        <div className="chat-container">
-          <h1>Witaj w corpo hell!</h1>
-          <button onClick={handleStartClick}>Rozpocznij grę</button>
-          <button onClick={handleContinueClick}>Kontynuuj grę</button>
-        </div>
+        !isQuestionnaireComplete ? (
+          <Questionnaire onComplete={handleQuestionnaireComplete} />
+        ) : (
+          <div className="chat-container">
+            <h1>Witaj w Corpo Hell!</h1>
+            <p>Przygotuj się na wyzwania korporacyjnego życia.</p>
+            <button onClick={handleStartClick}>Rozpocznij od nowa</button>
+            <button onClick={handleContinueClick}>Kontynuuj grę</button>
+          </div>
+        )
       ) : (
         <AppLayout />
       )}
