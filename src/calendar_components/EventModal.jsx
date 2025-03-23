@@ -129,7 +129,7 @@ export const EventModal = ({ event, onClose }) => {
               <input
                 type="datetime-local"
                 id="startTime"
-                value={formData.startTime.toISOString().slice(0, 16)}
+                value={new Date(formData.startTime.getTime() - formData.startTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -145,7 +145,7 @@ export const EventModal = ({ event, onClose }) => {
               <input
                 type="datetime-local"
                 id="endTime"
-                value={formData.endTime.toISOString().slice(0, 16)}
+                value={new Date(formData.endTime.getTime() - formData.endTime.getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
                 onChange={(e) =>
                   setFormData({
                     ...formData,

@@ -9,6 +9,12 @@ const DayColumn = ({ number, name, active, date, onEditEvent, className }) => {
   const events = useEvents();
   const dispatch = useEventDispatch();
 
+  const dayEvents = events.filter(
+    (event) =>
+      new Date(event.startTime.getTime() - event.startTime.getTimezoneOffset() * 60000).toDateString() ===
+      date.toDateString()
+  );
+
   const [{ isOver }, drop] = useDrop({
     accept: "EVENT",
     drop: (item, monitor) => {
@@ -17,12 +23,11 @@ const DayColumn = ({ number, name, active, date, onEditEvent, className }) => {
         .getElementById(`day-${date}`)
         .getBoundingClientRect();
       const hourHeight = 50; // height per hour in pixels
-      const droppedHour = Math.floor(
-        (dropOffset.y - columnRect.top) / hourHeight
-      );
+      const droppedHour = Math.floor((dropOffset.y - columnRect.top) / hourHeight);
 
       const newStartTime = new Date(date);
       newStartTime.setHours(droppedHour);
+      newStartTime.setMinutes(0); // Reset minutes to 0 for consistency
 
       dispatch({
         type: "MOVE_EVENT",
@@ -35,10 +40,6 @@ const DayColumn = ({ number, name, active, date, onEditEvent, className }) => {
       isOver: monitor.isOver(),
     }),
   });
-
-  const dayEvents = events.filter(
-    (event) => event.startTime.toDateString() === date.toDateString()
-  );
 
   return (
     <div

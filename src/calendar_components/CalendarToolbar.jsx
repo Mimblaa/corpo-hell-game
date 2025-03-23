@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./CalendarApp.module.css";
 import calendarIcon from "../assets/icons/calendar-icon.png";
 import arrowIcon from "../assets/icons/arrow.png";
 import dropdownIcon from "../assets/icons/dropdown.png";
 
-const CalendarToolbar = ({ onPrevWeek, onNextWeek, currentWeek, onToday }) => {
+const CalendarToolbar = ({ onPrevWeek, onNextWeek, currentWeek, onToday, onViewChange }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedView, setSelectedView] = useState("Tydzień roboczy");
+
   const formattedDate = `${currentWeek.toLocaleDateString("pl-PL", {
     weekday: "short",
     day: "numeric",
@@ -14,8 +17,14 @@ const CalendarToolbar = ({ onPrevWeek, onNextWeek, currentWeek, onToday }) => {
 
   const handleTodayClick = () => {
     if (onToday) {
-      onToday(); // Ensure the onToday function is called
+      onToday();
     }
+  };
+
+  const handleViewChange = (view) => {
+    setSelectedView(view);
+    setIsDropdownOpen(false);
+    onViewChange(view); // Notify parent about the view change
   };
 
   return (
@@ -44,10 +53,22 @@ const CalendarToolbar = ({ onPrevWeek, onNextWeek, currentWeek, onToday }) => {
         </div>
       </div>
       <div className={styles.viewSelector}>
-        <button className={styles.viewButton}>
-          <img src={dropdownIcon} alt="Week View" width="17" height="10" />
-          <span>Tydzień roboczy</span>
+        <button
+          className={styles.viewButton}
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        >
+          <img src={dropdownIcon} alt="View Options" width="17" height="10" />
+          <span>{selectedView}</span>
         </button>
+        {isDropdownOpen && (
+          <div className={styles.dropdownMenu}>
+            <button onClick={() => handleViewChange("Dzień")}>Dzień</button>
+            <button onClick={() => handleViewChange("Tydzień roboczy")}>
+              Tydzień roboczy
+            </button>
+            <button onClick={() => handleViewChange("Tydzień")}>Tydzień</button>
+          </div>
+        )}
       </div>
     </div>
   );
