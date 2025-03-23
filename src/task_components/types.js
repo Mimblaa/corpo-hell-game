@@ -18,6 +18,7 @@ export const predefinedCourses = [
   "Notatki",
   "Matematyka",
   "Korespondencja",
+  "Programowanie",
 ];
 
 export const predefinedTags = [

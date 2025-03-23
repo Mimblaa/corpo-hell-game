@@ -7,12 +7,14 @@ import notesIcon from "../assets/icons/notes.svg";
 import browserIcon from "../assets/icons/browser.svg";
 import emailIcon from "../assets/icons/email.svg";
 import artistIcon from "../assets/icons/artist.svg";
+import programmingIcon from "../assets/icons/programming.svg";
 
 import Calculator from "./Calculator";
 import Notepad from "./Notepad";
 import Browser from "./Browser";
 import Email from "./Email";
 import Drawing from "./Drawing";
+import Programming from "./Programming";
 
 const apps = [
   { id: 1, name: "Kalkulator", icon: calculatorIcon, component: Calculator, filter: (task) => task.course === "Matematyka" || task.course === "Statystyka" },
@@ -20,6 +22,7 @@ const apps = [
   { id: 3, name: "Przeglądarka", icon: browserIcon, component: Browser, filter: (task) => task.course === "Internet" },
   { id: 4, name: "Poczta", icon: emailIcon, component: Email, filter: (task) => task.course === "Poczta" || task.course === "Korespondencja" },
   { id: 5, name: "Grafika", icon: artistIcon, component: Drawing, filter: (task) => task.course === "Grafika" },
+  { id: 6, name: "Programowanie", icon: programmingIcon, component: Programming, filter: (task) => task.course === "Programowanie" },
 ];
 
 const AppsSection = () => {
