@@ -40,12 +40,14 @@
 .start-page {
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start; /* Align content at the top */
+    min-height: 100vh; /* Ensure the background spans the full viewport height */
     background: linear-gradient(135deg, #5b5fc7, #242424);
     color: white;
     font-family: 'Roboto', sans-serif;
     text-align: center;
+    padding: 20px; /* Add padding for better spacing */
+    box-sizing: border-box; /* Include padding in height calculations */
 }
 
 .start-page .chat-container {
@@ -53,8 +55,9 @@
     padding: 40px;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    max-width: 400px;
-    width: 90%;
+    max-width: 600px; /* Increase width for better readability */
+    width: 100%;
+    margin: 20px auto; /* Add margin for spacing */
 }
 
 .start-page .chat-container h1 {
@@ -62,6 +65,12 @@
     margin-bottom: 20px;
     color: #fff;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.start-page .chat-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #ddd;
 }
 
 .start-page .chat-container button {
@@ -89,4 +98,40 @@
     font-size: 1rem;
     margin-top: 10px;
     color: #ccc;
+}
+
+.start-page form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Add spacing between questions */
+}
+
+.start-page form div {
+    text-align: left; /* Align questions to the left for better readability */
+}
+
+.start-page form label {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    display: block;
+    color: #fff;
+}
+
+.start-page form input[type="radio"] {
+    margin-right: 10px;
+}
+
+.question-container {
+  margin-bottom: 20px;
+}
+
+.question-container label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 0; /* Remove space below the question */
+}
+
+.question-container div {
+  margin-left: 20px;
+  margin-bottom: 10px; /* Add space after each answer */
 }
