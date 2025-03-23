@@ -264,10 +264,11 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className={isAppVisible ? "app-container" : "start-page"}>
       {!isAppVisible ? (
         <div className="chat-container">
-          <h1>Witaj w corpo hell!</h1>
+          <h1>Witaj w Corpo Hell!</h1>
+          <p>Przygotuj się na wyzwania korporacyjnego życia.</p>
           <button onClick={handleStartClick}>Rozpocznij grę</button>
           <button onClick={handleContinueClick}>Kontynuuj grę</button>
         </div>

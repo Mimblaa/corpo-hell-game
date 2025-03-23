@@ -18,8 +18,8 @@
 
 .appsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 32px;
   width: 100%;
   max-width: 800px;
 }
@@ -28,11 +28,12 @@
   background-color: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 16px;
+  padding: 20px;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
+  width: 140px;
 }
 
 .appCard:hover {
@@ -41,10 +42,10 @@
 }
 
 .appIcon {
-  font-size: 32px;
+  font-size: 40px;
   margin-bottom: 8px;
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
 }
 
 .appName {
@@ -52,6 +53,8 @@
   font-size: 16px;
   font-weight: 500;
   color: #616161;
+  word-wrap: break-word;
+  text-align: center;
 }
 
 .browserTitle {
