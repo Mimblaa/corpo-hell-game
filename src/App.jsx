@@ -167,6 +167,16 @@ function App() {
         priority: "low", 
         tags: ["mail"],
       },
+      {
+        id: 9,
+        title: "Napisz funkcję sumującą",
+        dueDate: "2023-12-10T18:00:00",
+        course: "Programowanie",
+        status: "Nie przesłano",
+        priority: "medium",
+        tags: ["programowanie", "zadanie"],
+        description: "Napisz funkcję w JavaScript, która zwraca sumę dwóch liczb.",
+      },
   ];
 
   const defaultCalls = [
