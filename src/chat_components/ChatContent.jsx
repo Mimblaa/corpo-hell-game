@@ -7,6 +7,7 @@ import videoIcon from '../assets/icons/video-icon.png';
 import moreOptionsIcon from '../assets/icons/more-options-participants.png';
 import yourAvatar from '../assets/icons/profile-icon.png';
 import participantAvatar from '../assets/icons/user-avatar.png';
+import { addNotification } from "../notification_components/NotificationSection";
 
 const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChangeSection }) => {
   const messageListRef = useRef(null);
@@ -28,6 +29,10 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChan
       avatar: isAI ? participantAvatar : yourAvatar,
       isAI,
     };
+
+    if (isAI) {
+      addNotification("Nowa wiadomość od AI.");
+    }
 
     onSendMessage(newMessage);
   };

@@ -2,6 +2,18 @@
 import React, { useState, useEffect } from "react";
 import styles from "./NotificationSection.module.css";
 
+export const addNotification = (message) => {
+  const savedNotifications = localStorage.getItem("notifications");
+  const notifications = savedNotifications ? JSON.parse(savedNotifications) : [];
+  const newNotification = {
+    id: Date.now(),
+    message,
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    isRead: false,
+  };
+  localStorage.setItem("notifications", JSON.stringify([newNotification, ...notifications]));
+};
+
 const NotificationSection = () => {
   const [notifications, setNotifications] = useState(() => {
     const savedNotifications = localStorage.getItem("notifications");
