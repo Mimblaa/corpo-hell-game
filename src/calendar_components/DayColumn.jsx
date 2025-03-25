@@ -15,6 +15,26 @@ const DayColumn = ({ number, name, active, date, onEditEvent, className }) => {
       date.toDateString()
   );
 
+  const calculateOverlaps = (events) => {
+    const overlaps = [];
+    events.forEach((event) => {
+      let overlapGroup = overlaps.find((group) =>
+        group.some(
+          (e) =>
+            event.startTime < e.endTime && event.endTime > e.startTime // Check for overlap
+        )
+      );
+      if (!overlapGroup) {
+        overlapGroup = [];
+        overlaps.push(overlapGroup);
+      }
+      overlapGroup.push(event);
+    });
+    return overlaps;
+  };
+
+  const overlaps = calculateOverlaps(dayEvents);
+
   const [{ isOver }, drop] = useDrop({
     accept: "EVENT",
     drop: (item, monitor) => {
@@ -51,14 +71,18 @@ const DayColumn = ({ number, name, active, date, onEditEvent, className }) => {
         <div className={styles.dayNumber}>{number}</div>
         <div className={styles.dayName}>{name}</div>
       </div>
-      <div className={styles.eventsContainer}>
-        {dayEvents.map((event) => (
-          <Event
-            key={event.id}
-            event={event}
-            onDoubleClick={() => onEditEvent(event)} // Open EventModal on double-click
-          />
-        ))}
+      <div className={styles.eventsContainer} style={{ position: "relative", overflow: "hidden" }}>
+        {overlaps.flatMap((group, groupIndex) =>
+          group.map((event, eventIndex) => (
+            <Event
+              key={event.id}
+              event={event}
+              onDoubleClick={() => onEditEvent(event)}
+              overlapIndex={eventIndex}
+              totalOverlaps={group.length}
+            />
+          ))
+        )}
       </div>
     </div>
   );
