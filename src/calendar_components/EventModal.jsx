@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useEventDispatch } from "./EventContext";
 import { RecurrenceSelector } from "./RecurrenceSelector";
 import styles from "./CalendarApp.module.css";
+import { addNotification } from "../notification_components/NotificationSection";
 
 export const EventModal = ({ event, onClose }) => {
   const dispatch = useEventDispatch();
@@ -63,6 +64,12 @@ export const EventModal = ({ event, onClose }) => {
         type: isEditMode ? "UPDATE_EVENT" : "ADD_EVENT", // Differentiate between add and update
         event: eventData,
       });
+
+      addNotification(
+        isEditMode
+          ? `Spotkanie "${formData.title}" zostało zaktualizowane.`
+          : `Dodano nowe spotkanie: "${formData.title}".`
+      );
 
       onClose();
     } catch (error) {

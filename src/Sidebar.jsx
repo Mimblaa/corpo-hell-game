@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./Sidebar.module.css";
 
 import notificationIcon from './assets/icons/notification-icon.png';
@@ -12,11 +12,51 @@ import onedriveIcon from './assets/icons/onedrive-icon.png';
 import appsIcon from './assets/icons/apps-icon.png';
 
 const Sidebar = ({ activeSection, onSectionChange }) => {
+  const [unreadCount, setUnreadCount] = useState(() => {
+    const savedNotifications = localStorage.getItem("notifications");
+    const notifications = savedNotifications ? JSON.parse(savedNotifications) : [];
+    return notifications.filter((notification) => !notification.isRead).length;
+  });
+
+  const [isNotificationSectionVisited, setIsNotificationSectionVisited] = useState(() => {
+    return localStorage.getItem("notificationVisited") === "true";
+  });
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedNotifications = localStorage.getItem("notifications");
+      const notifications = savedNotifications ? JSON.parse(savedNotifications) : [];
+      setUnreadCount(notifications.filter((notification) => !notification.isRead).length);
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedNotifications = localStorage.getItem("notifications");
+      const notifications = savedNotifications ? JSON.parse(savedNotifications) : [];
+      setUnreadCount(notifications.filter((notification) => !notification.isRead).length);
+    }, 500); // Update every 500ms to reflect changes in real-time
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSectionChange = (section) => {
+    if (section === "notification") {
+      setIsNotificationSectionVisited(true);
+      localStorage.setItem("notificationVisited", "true");
+    }
+    onSectionChange(section);
+  };
+
   const navItems = [
     {
       id: "notification",
       icon: notificationIcon,
-      label: "Notification",
+      label: "Powiadomienia",
+      badge: isNotificationSectionVisited ? unreadCount : 0,
     },
     {
       id: "chat",
@@ -64,10 +104,13 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
             className={`${styles.navItem} ${
               activeSection === item.id ? styles.active : ""
             }`}
-            onClick={() => onSectionChange(item.id)}
+            onClick={() => handleSectionChange(item.id)}
             aria-label={item.label}
           >
             <img src={item.icon} alt="" className={styles.navIcon} />
+            {item.badge > 0 && (
+              <span className={styles.badge}>{item.badge}</span>
+            )}
             <span className={styles.navLabel}>{item.label}</span>
           </button>
         ))}

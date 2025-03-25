@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./TaskSection.module.css";
+import { addNotification } from "../notification_components/NotificationSection";
 
 const TaskCard = ({
   title,
@@ -26,6 +27,7 @@ const TaskCard = ({
   const handleGameSubmit = () => {
     if (parseInt(mathAnswer, 10) === mathProblem.a + mathProblem.b) {
       onComplete();
+      addNotification("Zadanie zostało ukończone.");
     }
     setIsGameOpen(false);
     setMathAnswer("");

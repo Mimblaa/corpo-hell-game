@@ -5,6 +5,7 @@ import PrioritySelector from "./PrioritySelector";
 import TagSelector from "./TagSelector";
 import FileUpload from "./FileUpload";
 import { predefinedCourses, predefinedTags } from "./types";
+import { addNotification } from "../notification_components/NotificationSection";
 
 const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -28,6 +29,16 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
+
+    const isEdit = !!formData.id;
+    addNotification(
+      isEdit
+        ? `Zadanie "${formData.title}" zostało zaktualizowane.`
+        : `Dodano nowe zadanie: "${formData.title}".`
+    );
+
+    // Example for marking a task as completed (if applicable):
+    addNotification(`Zadanie "${formData.title}" zostało ukończone.`);
 
     // Pobierz istniejące zadania z localStorage
     const savedTasks = localStorage.getItem("tasks");

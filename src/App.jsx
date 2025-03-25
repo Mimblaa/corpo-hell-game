@@ -357,6 +357,12 @@ function App() {
     }
   ];
 
+  const defaultNotifications = [
+    { id: 1, message: "Nowe zadanie zostało dodane.", time: "5 minut temu", isRead: false },
+    { id: 2, message: "Termin zadania zbliża się.", time: "1 godzina temu", isRead: false },
+    { id: 3, message: "Zadanie zostało ukończone.", time: "Wczoraj", isRead: true },
+  ];
+
   const handleQuestionnaireComplete = () => {
     setIsQuestionnaireComplete(true);
     setIsAppVisible(true);
@@ -379,6 +385,7 @@ function App() {
     localStorage.setItem("contacts", JSON.stringify(defaultContacts));
     localStorage.setItem("scenarios", JSON.stringify(scenarios)); // Save scenarios to localStorage
     localStorage.setItem("questionnaireData", JSON.stringify(questionnaireData)); // Save questionnaire data to localStorage
+    localStorage.setItem("notifications", JSON.stringify(defaultNotifications)); // Save notifications to localStorage
 
     setIsQuestionnaireComplete(false); // Trigger questionnaire
   };
