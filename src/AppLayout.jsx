@@ -8,6 +8,7 @@ import ChatSection from "./chat_components/ChatSection";
 import AppsSection from "./apps_components/AppsSection";
 import OneDriveSection from "./onedrive_components/OneDriveSection";
 import CallsSection from "./calls_components/CallsSection";
+import NotificationSection from "./notification_components/NotificationSection";
 import styles from "./AppLayout.module.css";
 
 const AppLayout = () => {
@@ -28,6 +29,9 @@ const AppLayout = () => {
 
   const handleSectionChange = (section) => {
     setActiveSection(section);
+    if (section === "notification") {
+      localStorage.setItem("notificationVisited", "true");
+    }
   };
 
   const handleSearch = (query) => {
@@ -48,6 +52,8 @@ const AppLayout = () => {
         return <OneDriveSection />;
       case "calls":
         return <CallsSection />;
+      case "notification":
+        return <NotificationSection />;
       default:
         return null;
     }
@@ -59,7 +65,7 @@ const AppLayout = () => {
       <div className={styles.contentWrapper}>
         <Sidebar
           activeSection={activeSection}
-          onSectionChange={handleSectionChange}
+          onSectionChange={handleSectionChange} // Pass updated handler
         />
         {renderContent()}
       </div>
