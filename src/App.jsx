@@ -364,12 +364,6 @@ function App() {
     { id: 3, message: "Zadanie zostało ukończone.", time: "Wczoraj", isRead: true },
   ];
 
-  const defaultNotifications = [
-    { id: 1, message: "Nowe zadanie zostało dodane.", time: "5 minut temu", isRead: false },
-    { id: 2, message: "Termin zadania zbliża się.", time: "1 godzina temu", isRead: false },
-    { id: 3, message: "Zadanie zostało ukończone.", time: "Wczoraj", isRead: true },
-  ];
-
   const defaultEvents = [
     {
       id: "1",
