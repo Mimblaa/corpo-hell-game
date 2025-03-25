@@ -37,9 +37,6 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
         : `Dodano nowe zadanie: "${formData.title}".`
     );
 
-    // Example for marking a task as completed (if applicable):
-    addNotification(`Zadanie "${formData.title}" zostało ukończone.`);
-
     // Pobierz istniejące zadania z localStorage
     const savedTasks = localStorage.getItem("tasks");
     const tasks = savedTasks ? JSON.parse(savedTasks) : [];
