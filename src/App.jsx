@@ -5,6 +5,7 @@ import "./App.css";
 
 import participantAvatar from './assets/icons/user-avatar.png';
 import yourAvatar from './assets/icons/profile-icon.png';
+import { generateRecurringInstances } from "./calendar_components/EventContext"; // Import the function
 
 function App() {
   const [isAppVisible, setIsAppVisible] = useState(false);
@@ -363,6 +364,69 @@ function App() {
     { id: 3, message: "Zadanie zostało ukończone.", time: "Wczoraj", isRead: true },
   ];
 
+  const defaultNotifications = [
+    { id: 1, message: "Nowe zadanie zostało dodane.", time: "5 minut temu", isRead: false },
+    { id: 2, message: "Termin zadania zbliża się.", time: "1 godzina temu", isRead: false },
+    { id: 3, message: "Zadanie zostało ukończone.", time: "Wczoraj", isRead: true },
+  ];
+
+  const defaultEvents = [
+    {
+      id: "1",
+      title: "Weekly Team Meeting",
+      description: "Discuss project updates and blockers.",
+      startTime: new Date("2025-03-25T10:00:00"),
+      endTime: new Date("2025-03-25T11:00:00"),
+      color: "#5b5fc7",
+      location: "Conference Room A",
+      attendees: ["John Doe", "Jane Smith"],
+      isRecurring: true,
+      recurrencePattern: {
+        frequency: "weekly",
+        interval: 1,
+        endDate: new Date("2025-06-25T10:00:00"),
+      },
+    },
+    {
+      id: "2",
+      title: "Client Presentation",
+      description: "Present the project progress to the client.",
+      startTime: new Date("2025-03-25T14:00:00"),
+      endTime: new Date("2025-03-25T15:30:00"),
+      color: "#f28b82",
+      location: "Zoom",
+      attendees: ["Client A", "Project Manager"],
+    },
+    {
+      id: "3",
+      title: "One-on-One with Manager",
+      description: "Discuss career growth and feedback.",
+      startTime: new Date("2025-03-28T14:00:00"),
+      endTime: new Date("2025-03-28T14:30:00"),
+      color: "#34a853",
+      location: "Manager's Office",
+      attendees: ["Manager"],
+    },
+    {
+      id: "4",
+      title: "Daily Standup",
+      description: "Quick sync-up on daily tasks and blockers.",
+      startTime: new Date("2025-03-24T09:00:00"),
+      endTime: new Date("2025-03-24T09:15:00"),
+      color: "#4285f4",
+      location: "Online",
+      attendees: ["Team Members"],
+      isRecurring: true,
+      recurrencePattern: {
+        frequency: "daily",
+        interval: 1,
+        endDate: new Date("2025-04-30T09:15:00"), // Extended endDate for more occurrences
+      },
+    },
+  ];
+
+  const expandedDefaultEvents = defaultEvents.flatMap(generateRecurringInstances); // Generate instances
+
   const handleQuestionnaireComplete = () => {
     setIsQuestionnaireComplete(true);
     setIsAppVisible(true);
@@ -386,6 +450,7 @@ function App() {
     localStorage.setItem("scenarios", JSON.stringify(scenarios)); // Save scenarios to localStorage
     localStorage.setItem("questionnaireData", JSON.stringify(questionnaireData)); // Save questionnaire data to localStorage
     localStorage.setItem("notifications", JSON.stringify(defaultNotifications)); // Save notifications to localStorage
+    localStorage.setItem("events", JSON.stringify(expandedDefaultEvents)); // Save expanded events to localStorage
 
     setIsQuestionnaireComplete(false); // Trigger questionnaire
   };

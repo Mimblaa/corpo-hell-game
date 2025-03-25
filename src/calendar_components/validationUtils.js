@@ -57,6 +57,22 @@ export const validateEventForm = (formData) => {
     ) {
       errors.recurrence = "Please select at least one day of the week";
     }
+
+    if (
+      formData.recurrencePattern.endDate &&
+      new Date(formData.recurrencePattern.endDate) < new Date(formData.startTime)
+    ) {
+      errors.recurrence = "End date must be after the start date";
+    }
+
+    const MAX_INSTANCES = 30;
+    if (formData.recurrencePattern.occurrences && formData.recurrencePattern.occurrences > MAX_INSTANCES) {
+      errors.recurrence = `Occurrences cannot exceed ${MAX_INSTANCES}`;
+    }
+
+    if (!formData.recurrencePattern.occurrences && !formData.recurrencePattern.endDate) {
+      errors.recurrence = `Please specify an end date or limit occurrences to avoid excessive instances.`;
+    }
   }
 
   return errors;

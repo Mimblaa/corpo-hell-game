@@ -3,7 +3,7 @@ import React from "react";
 import { useDrag } from "react-dnd";
 import styles from "./CalendarApp.module.css";
 
-export const Event = ({ event, onDoubleClick }) => {
+export const Event = ({ event, onDoubleClick, overlapIndex, totalOverlaps }) => {
   const [{ isDragging }, drag] = useDrag({
     type: "EVENT",
     item: { id: event.id, type: "EVENT" },
@@ -17,19 +17,24 @@ export const Event = ({ event, onDoubleClick }) => {
     localStartTime.getHours() * 60 +
     localStartTime.getMinutes();
   const durationMinutes =
-    (event.endTime - event.startTime) / (1000 * 60); // Przeliczenie z ms na minuty
+    (event.endTime - event.startTime) / (1000 * 60);
+
+  const widthPercentage = 100 / totalOverlaps;
+  const leftOffsetPercentage = overlapIndex * widthPercentage;
 
   return (
     <div
       ref={drag}
-      className={styles.calendarEvent}
+      className={`${styles.calendarEvent} ${styles.dynamicEvent}`}
       style={{
-        top: `${minutesFromMidnight}px`, // Ustawienie na odpowiedniej godzinie
-        height: `${durationMinutes}px`, // Ustawienie odpowiedniej wysokości
+        top: `${minutesFromMidnight}px`,
+        height: `${durationMinutes}px`,
+        width: `calc(${widthPercentage}% - 2px)`,
+        left: `calc(${leftOffsetPercentage}% + 1px)`,
         backgroundColor: event.color || "#5b5fc7",
         opacity: isDragging ? 0.5 : 1,
       }}
-      onDoubleClick={onDoubleClick} // Handle double-click
+      onDoubleClick={onDoubleClick}
     >
       <h3 className={styles.eventTitle}>{event.title}</h3>
       <p className={styles.eventTime}>
