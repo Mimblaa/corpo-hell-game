@@ -31,7 +31,7 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChan
     };
 
     if (isAI) {
-      addNotification("Nowa wiadomość od AI.");
+      addNotification(`Nowa wiadomość od "${chatName}".`);
     }
 
     onSendMessage(newMessage);

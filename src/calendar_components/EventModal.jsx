@@ -65,7 +65,11 @@ export const EventModal = ({ event, onClose }) => {
         event: eventData,
       });
 
-      addNotification(isEditMode ? "Spotkanie zostało zaktualizowane." : "Dodano nowe spotkanie.");
+      addNotification(
+        isEditMode
+          ? `Spotkanie "${formData.title}" zostało zaktualizowane.`
+          : `Dodano nowe spotkanie: "${formData.title}".`
+      );
 
       onClose();
     } catch (error) {
