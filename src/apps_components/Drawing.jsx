@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import styles from "./AppsSection.module.css";
+import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Drawing = ({ tasks, setTasks }) => {
   const [selectedTask, setSelectedTask] = useState(null); // Track selected task
@@ -34,13 +35,21 @@ const Drawing = ({ tasks, setTasks }) => {
     isDrawing.current = false;
   };
 
+  const handleTaskCompletion = (task) => {
+    addNotification(`Zadanie "${task.title}" zostało ukończone.`);
+  };
+
   const handleSubmit = () => {
     if (selectedTask) {
       setFeedback("Brawo! Zadanie wykonane.");
       setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
-        )
+        prevTasks.map((task) => {
+          if (task.id === selectedTask.id) {
+            handleTaskCompletion(task);
+            return { ...task, status: "Ukończone" };
+          }
+          return task;
+        })
       );
     }
   };

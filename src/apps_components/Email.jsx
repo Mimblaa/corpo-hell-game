@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
+import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Email = ({ tasks, setTasks }) => {
   const [emailTask] = useState({
@@ -12,6 +13,10 @@ const Email = ({ tasks, setTasks }) => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showTask, setShowTask] = useState(false);
 
+  const handleTaskCompletion = (task) => {
+    addNotification(`Zadanie "${task.title}" zostało ukończone.`);
+  };
+
   const handleSubmit = () => {
     if (
       selectedTask &&
@@ -20,9 +25,13 @@ const Email = ({ tasks, setTasks }) => {
     ) {
       setFeedback("Brawo! Mail został poprawnie wysłany.");
       setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
-        )
+        prevTasks.map((task) => {
+          if (task.id === selectedTask.id) {
+            handleTaskCompletion(task);
+            return { ...task, status: "Ukończone" };
+          }
+          return task;
+        })
       );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");

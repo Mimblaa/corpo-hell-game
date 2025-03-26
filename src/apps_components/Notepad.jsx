@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
+import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Notepad = ({ tasks, setTasks }) => {
   const [transcriptionTask] = useState(
@@ -26,14 +27,22 @@ const Notepad = ({ tasks, setTasks }) => {
     setSelectedTask(null);
   };
 
+  const handleTaskCompletion = (task) => {
+    addNotification(`Zadanie "${task.title}" zostało ukończone.`);
+  };
+
   const handleSubmit = () => {
     const expectedText = transcriptionTask.split(": ")[1].replace(/'/g, "").trim();
     if (selectedTask && userText.trim() === expectedText) {
       setFeedback("Brawo! Poprawnie przepisałeś tekst.");
       setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
-        )
+        prevTasks.map((task) => {
+          if (task.id === selectedTask.id) {
+            handleTaskCompletion(task);
+            return { ...task, status: "Ukończone" };
+          }
+          return task;
+        })
       );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");

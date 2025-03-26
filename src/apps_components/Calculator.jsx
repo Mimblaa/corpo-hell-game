@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
+import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Calculator = ({ tasks, setTasks }) => {
   const generateMathProblem = () => {
@@ -22,14 +23,22 @@ const Calculator = ({ tasks, setTasks }) => {
     setUserAnswer("");
   };
 
+  const handleTaskCompletion = (task) => {
+    addNotification(`Zadanie "${task.title}" zostało ukończone.`);
+  };
+
   const handleSubmit = () => {
     console.log(selectedTask);
     if (selectedTask && parseInt(userAnswer, 10) === mathProblem.answer) {
       setFeedback("Brawo! Poprawna odpowiedź.");
       setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
-        )
+        prevTasks.map((task) => {
+          if (task.id === selectedTask.id) {
+            handleTaskCompletion(task);
+            return { ...task, status: "Ukończone" };
+          }
+          return task;
+        })
       );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");
