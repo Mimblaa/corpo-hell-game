@@ -51,7 +51,10 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
   const handlePenaltyChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
-      penalty: { ...prev.penalty, [field]: value },
+      penalty: {
+        ...prev.penalty,
+        [field]: field === "value" ? -Math.abs(value) : value,
+      },
     }));
   };
 

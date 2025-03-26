@@ -39,9 +39,42 @@ const Drawing = ({ tasks, setTasks }) => {
     addNotification(`Zadanie "${task.title}" zostało ukończone.`);
   };
 
+  const updatePlayerStats = (effect, penalty) => {
+    const stats = JSON.parse(localStorage.getItem("playerStats")) || {};
+
+    const statMapping = {
+      "Reputacja": "reputation",
+      "Zaufanie Szefa": "bossTrust",
+      "Zaufanie Zespołu": "teamTrust",
+      "Polityczny Spryt": "politicalSkill",
+      "Unikanie Odpowiedzialności": "responsibilityAvoidance",
+      "Cwaniactwo": "buzzwordPower",
+      "Stres": "stress",
+      "Cierpliwość": "patience",
+      "Produktywność Teatralna": "productivityTheatre",
+    };
+
+    const applyStatChanges = (statObject, isEffect = true) => {
+      if (statObject && statObject.attribute && statObject.value) {
+        const mappedStat = statMapping[statObject.attribute];
+        if (mappedStat) {
+          const currentValue = parseInt(stats[mappedStat] || 0, 10);
+          const changeValue = isEffect ? parseInt(statObject.value, 10) : parseInt(statObject.value, 10);
+          stats[mappedStat] = currentValue + changeValue;
+        }
+      }
+    };
+
+    if (effect) applyStatChanges(effect, true);
+    if (penalty) applyStatChanges(penalty, false);
+
+    localStorage.setItem("playerStats", JSON.stringify(stats));
+  };
+
   const handleSubmit = () => {
     if (selectedTask) {
       setFeedback("Brawo! Zadanie wykonane.");
+      updatePlayerStats(selectedTask.effect, selectedTask.penalty); // Update stats
       setTasks((prevTasks) =>
         prevTasks.map((task) => {
           if (task.id === selectedTask.id) {
