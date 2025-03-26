@@ -108,6 +108,8 @@ function App() {
         status: "Nie przesłano",
         priority: "high", 
         tags: ["prezentacja", "projekt"],
+        effect: { attribute: "Reputacja", value: 5 },
+        penalty: { attribute: "Zaufanie Zespołu", value: -3 },
       },
       {
         id: 2,
@@ -117,6 +119,8 @@ function App() {
         status: "Nie przesłano",
         priority: "medium", 
         tags: ["zadanie", "statystyka"],
+        effect: { attribute: "Efektywność", value: 3 },
+        penalty: { attribute: "Cierpliwość", value: -2 },
       },
       {
         id: 3,
@@ -126,6 +130,8 @@ function App() {
         status: "Po terminie",
         priority: "low", 
         tags: ["raport", "badania"],
+        effect: { attribute: "Polityczny Spryt", value: 4 },
+        penalty: { attribute: "Reputacja", value: -5 },
       },
       {
         id: 4,
@@ -135,6 +141,8 @@ function App() {
         status: "Po terminie",
         priority: "high", 
         tags: ["projekt", "notatki"],
+        effect: { attribute: "Zaufanie Zespołu", value: 6 },
+        penalty: { attribute: "Efektywność", value: -4 },
       },
       {
         id: 5,
@@ -144,6 +152,8 @@ function App() {
         status: "Ukończone",
         priority: "medium", 
         tags: ["matematyka"],
+        effect: { attribute: "Efektywność", value: 5 },
+        penalty: { attribute: "Cierpliwość", value: -3 },
       },
       {
         id: 6,
@@ -153,6 +163,8 @@ function App() {
         status: "Ukończone",
         priority: "low", 
         tags: ["spotkania"],
+        effect: { attribute: "Reputacja", value: 4 },
+        penalty: { attribute: "Zaufanie Szefa", value: -2 },
       }, 
       {
         id: 7,
@@ -162,6 +174,8 @@ function App() {
         status: "Po terminie",
         priority: "low", 
         tags: ["mail"],
+        effect: { attribute: "Zaufanie Szefa", value: 3 },
+        penalty: { attribute: "Cierpliwość", value: -2 },
       }, 
       {
         id: 8,
@@ -171,6 +185,8 @@ function App() {
         status: "Po terminie",
         priority: "low", 
         tags: ["mail"],
+        effect: { attribute: "Polityczny Spryt", value: 4 },
+        penalty: { attribute: "Zaufanie Zespołu", value: -3 },
       },
       {
         id: 9,
@@ -181,6 +197,8 @@ function App() {
         priority: "medium",
         tags: ["programowanie", "zadanie"],
         description: "Napisz funkcję w JavaScript, która zwraca sumę dwóch liczb.",
+        effect: { attribute: "Efektywność", value: 5 },
+        penalty: { attribute: "Cierpliwość", value: -2 },
       },
   ];
 

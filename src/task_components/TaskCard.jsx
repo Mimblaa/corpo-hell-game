@@ -8,6 +8,8 @@ const TaskCard = ({
   status,
   priority,
   tags,
+  effect,
+  penalty,
 }) => {
 
   return (
@@ -30,6 +32,14 @@ const TaskCard = ({
               ))}
             </div>
           )}
+          <div className={styles.taskEffects}>
+            <p className={styles.effect}>
+              <strong>Efekt:</strong> {effect.attribute} {effect.value > 0 ? `+${effect.value}` : effect.value}
+            </p>
+            <p className={styles.penalty}>
+              <strong>Kara:</strong> {penalty.attribute} {penalty.value > 0 ? `+${penalty.value}` : penalty.value}
+            </p>
+          </div>
         </div>
         <span
           className={`${styles.taskStatus} ${

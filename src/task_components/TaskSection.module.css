@@ -372,6 +372,25 @@
   font-size: 10px;
 }
 
+.taskEffects {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.effect,
+.penalty {
+  font-size: 12px;
+  color: #424242;
+  font-family: Roboto, sans-serif;
+}
+
+.effect strong,
+.penalty strong {
+  color: #242424;
+}
+
 /* Modal styles */
 .modalOverlay {
   position: fixed;
@@ -575,6 +594,11 @@
   overflow-y: auto;
   max-height: calc(100vh - 150px); /* Adjust height as needed */
   padding-bottom: 16px; /* Ensure space for the last item */
+}
+
+.effectPenaltyGroup {
+  display: flex;
+  gap: 8px;
 }
 
 /* Responsive styles */
