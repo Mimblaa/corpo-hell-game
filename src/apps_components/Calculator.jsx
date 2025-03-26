@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./AppsSection.module.css";
+import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Calculator = ({ tasks, setTasks }) => {
   const generateMathProblem = () => {
@@ -22,14 +23,55 @@ const Calculator = ({ tasks, setTasks }) => {
     setUserAnswer("");
   };
 
+  const handleTaskCompletion = (task) => {
+    addNotification(`Zadanie "${task.title}" zostało ukończone.`);
+  };
+
+  const updatePlayerStats = (effect, penalty) => {
+    const stats = JSON.parse(localStorage.getItem("playerStats")) || {};
+
+    const statMapping = {
+      "Reputacja": "reputation",
+      "Zaufanie Szefa": "bossTrust",
+      "Zaufanie Zespołu": "teamTrust",
+      "Polityczny Spryt": "politicalSkill",
+      "Unikanie Odpowiedzialności": "responsibilityAvoidance",
+      "Cwaniactwo": "buzzwordPower",
+      "Stres": "stress",
+      "Cierpliwość": "patience",
+      "Produktywność Teatralna": "productivityTheatre",
+    };
+
+    const applyStatChanges = (statObject, isEffect = true) => {
+      if (statObject && statObject.attribute && statObject.value) {
+        const mappedStat = statMapping[statObject.attribute];
+        if (mappedStat) {
+          const currentValue = parseInt(stats[mappedStat] || 0, 10);
+          const changeValue = isEffect ? parseInt(statObject.value, 10) : parseInt(statObject.value, 10);
+          stats[mappedStat] = currentValue + changeValue;
+        }
+      }
+    };
+
+    if (effect) applyStatChanges(effect, true);
+    if (penalty) applyStatChanges(penalty, false);
+
+    localStorage.setItem("playerStats", JSON.stringify(stats));
+  };
+
   const handleSubmit = () => {
     console.log(selectedTask);
     if (selectedTask && parseInt(userAnswer, 10) === mathProblem.answer) {
       setFeedback("Brawo! Poprawna odpowiedź.");
+      updatePlayerStats(selectedTask.effect, selectedTask.penalty); // Update stats
       setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task.id === selectedTask.id ? { ...task, status: "Ukończone" } : task
-        )
+        prevTasks.map((task) => {
+          if (task.id === selectedTask.id) {
+            handleTaskCompletion(task);
+            return { ...task, status: "Ukończone" };
+          }
+          return task;
+        })
       );
     } else {
       setFeedback("Niestety, spróbuj ponownie.");

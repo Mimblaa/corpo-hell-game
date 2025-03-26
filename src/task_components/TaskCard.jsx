@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styles from "./TaskSection.module.css";
-import { addNotification } from "../notification_components/NotificationSection";
 
 const TaskCard = ({
   title,
@@ -9,35 +8,14 @@ const TaskCard = ({
   status,
   priority,
   tags,
-  onComplete,
+  effect,
+  penalty,
 }) => {
-  const [isGameOpen, setIsGameOpen] = useState(false);
-  const [mathAnswer, setMathAnswer] = useState("");
-  const [mathProblem, setMathProblem] = useState({ a: 0, b: 0 });
-
-  const handleDoubleClick = () => {
-    if (status !== "Ukończone") {
-      const a = Math.floor(Math.random() * 10) + 1;
-      const b = Math.floor(Math.random() * 10) + 1;
-      setMathProblem({ a, b });
-      setIsGameOpen(true);
-    }
-  };
-
-  const handleGameSubmit = () => {
-    if (parseInt(mathAnswer, 10) === mathProblem.a + mathProblem.b) {
-      onComplete();
-      addNotification("Zadanie zostało ukończone.");
-    }
-    setIsGameOpen(false);
-    setMathAnswer("");
-  };
 
   return (
     <>
       <div
         className={`${styles.taskCard} ${styles[`priority${priority}`]}`}
-        onDoubleClick={handleDoubleClick}
       >
         <div className={styles.taskContent}>
           <h3 className={styles.taskTitle}>{title}</h3>
@@ -54,6 +32,14 @@ const TaskCard = ({
               ))}
             </div>
           )}
+          <div className={styles.taskEffects}>
+            <p className={styles.effect}>
+              <strong>Efekt:</strong> {effect.attribute} {effect.value > 0 ? `+${effect.value}` : effect.value}
+            </p>
+            <p className={styles.penalty}>
+              <strong>Kara:</strong> {penalty.attribute} {penalty.value > 0 ? `+${penalty.value}` : penalty.value}
+            </p>
+          </div>
         </div>
         <span
           className={`${styles.taskStatus} ${
@@ -63,38 +49,6 @@ const TaskCard = ({
           {status}
         </span>
       </div>
-      {isGameOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <header className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Rozwiąż zadanie matematyczne</h2>
-              <button
-                className={styles.closeButton}
-                onClick={() => setIsGameOpen(false)}
-              >
-                ×
-              </button>
-            </header>
-            <div className={styles.form}>
-              <p>
-                Oblicz: {mathProblem.a} + {mathProblem.b}
-              </p>
-              <input
-                type="number"
-                value={mathAnswer}
-                onChange={(e) => setMathAnswer(e.target.value)}
-                className={styles.input}
-              />
-              <button
-                onClick={handleGameSubmit}
-                className={styles.submitButton}
-              >
-                Sprawdź
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

@@ -7,6 +7,19 @@ import FileUpload from "./FileUpload";
 import { predefinedCourses, predefinedTags } from "./types";
 import { addNotification } from "../notification_components/NotificationSection";
 
+const attributes = [
+  "Reputacja",
+  "Zaufanie Szefa",
+  "Zaufanie Zespołu",
+  "Efektywność",
+  "Polityczny Spryt",
+  "Unikanie Odpowiedzialności",
+  "Cwaniactwo",
+  "Stres",
+  "Cierpliwość",
+  "Produktywność Teatralna",
+];
+
 const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -16,6 +29,8 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
     priority: "medium",
     tags: [],
     files: [],
+    effect: { attribute: "", value: "" },
+    penalty: { attribute: "", value: "" },
   });
 
   const handleChange = (e) => {
@@ -23,6 +38,23 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleEffectChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      effect: { ...prev.effect, [field]: value },
+    }));
+  };
+
+  const handlePenaltyChange = (field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      penalty: {
+        ...prev.penalty,
+        [field]: field === "value" ? -Math.abs(value) : value,
+      },
     }));
   };
 
@@ -37,14 +69,8 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
         : `Dodano nowe zadanie: "${formData.title}".`
     );
 
-    // Example for marking a task as completed (if applicable):
-    addNotification(`Zadanie "${formData.title}" zostało ukończone.`);
-
-    // Pobierz istniejące zadania z localStorage
     const savedTasks = localStorage.getItem("tasks");
     const tasks = savedTasks ? JSON.parse(savedTasks) : [];
-
-    // Dodaj nowe zadanie do listy i zapisz w localStorage
     const updatedTasks = [...tasks, { id: Date.now(), ...formData }];
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
 
@@ -56,6 +82,8 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
       priority: "medium",
       tags: [],
       files: [],
+      effect: { attribute: "", value: "" },
+      penalty: { attribute: "", value: "" },
     });
     onClose();
   };
@@ -158,6 +186,54 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
                 setFormData((prev) => ({ ...prev, description: e.target.value }))
               }
             />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Efekt</label>
+            <div className={styles.effectPenaltyGroup}>
+              <select
+                value={formData.effect.attribute}
+                onChange={(e) => handleEffectChange("attribute", e.target.value)}
+                className={styles.input}
+              >
+                <option value="">Wybierz cechę</option>
+                {attributes.map((attr) => (
+                  <option key={attr} value={attr}>
+                    {attr}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                value={formData.effect.value}
+                onChange={(e) => handleEffectChange("value", e.target.value)}
+                className={styles.input}
+                placeholder="Wartość"
+              />
+            </div>
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Kara</label>
+            <div className={styles.effectPenaltyGroup}>
+              <select
+                value={formData.penalty.attribute}
+                onChange={(e) => handlePenaltyChange("attribute", e.target.value)}
+                className={styles.input}
+              >
+                <option value="">Wybierz cechę</option>
+                {attributes.map((attr) => (
+                  <option key={attr} value={attr}>
+                    {attr}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                value={formData.penalty.value}
+                onChange={(e) => handlePenaltyChange("value", e.target.value)}
+                className={styles.input}
+                placeholder="Wartość"
+              />
+            </div>
           </div>
           <div className={styles.formActions}>
             <button
