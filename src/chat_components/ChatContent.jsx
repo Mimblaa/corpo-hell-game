@@ -9,7 +9,7 @@ import yourAvatar from '../assets/icons/profile-icon.png';
 import participantAvatar from '../assets/icons/user-avatar.png';
 import { addNotification } from "../notification_components/NotificationSection";
 
-const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChangeSection }) => {
+const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChangeSection, isAiTyping }) => {
   const messageListRef = useRef(null);
   const [isInMeeting, setIsInMeeting] = useState(false);
 
@@ -22,19 +22,7 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChan
   const handleSendMessage = (messageText, isAI = false) => {
     if (!messageText.trim()) return;
 
-    const newMessage = {
-      sender: isAI ? "AI" : "You",
-      message: messageText,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      avatar: isAI ? participantAvatar : yourAvatar,
-      isAI,
-    };
-
-    if (isAI) {
-      addNotification(`Nowa wiadomość od "${chatName}".`);
-    }
-
-    onSendMessage(newMessage);
+    onSendMessage(messageText, isAI); 
   };
 
   const handleStartMeeting = () => {
@@ -88,18 +76,26 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChan
         </div>
       </header>
       <div className={styles.messageList} ref={messageListRef}>
-        {messages.map((message) => (
-          <div key={message.id} className={styles.messageWithAvatar}>
-            <MessageBubble
-              message={message.message}
-              sender={message.sender}
-              time={message.time}
-              avatar={message.avatar}
-              isOwn={!message.isAI}
-            />
-          </div>
-        ))}
+        {messages.map((message) => {
+          const isOwnMessage = message.sender === "You";
+          return (
+            <div 
+              key={message.id} 
+              // Apply alignment classes to this wrapper
+              className={`${styles.messageWrapper} ${isOwnMessage ? styles.ownMessageWrapper : styles.otherMessageWrapper}`}
+            >
+              <MessageBubble
+                message={message.message}
+                sender={message.sender}
+                time={message.time}
+                avatar={message.avatar}
+                isOwn={isOwnMessage} // isOwn is still needed for internal MessageBubble styling (e.g., avatar order)
+              />
+            </div>
+          );
+        })}
       </div>
+      {isAiTyping && <div className={styles.typingIndicator}>{chatName} pisze...</div>}
       <ChatInput onSendMessage={handleSendMessage} />
     </section>
   );

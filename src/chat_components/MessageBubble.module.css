@@ -1,12 +1,14 @@
 .messageContainer {
     display: flex;
     gap: 8px;
-    margin: 16px 0;
+    /* Vertical margins removed, handled by .messageWrapper in ChatContent.module.css */
     animation: fadeIn 0.3s ease;
+    max-width: 85%; /* Max width of the bubble component itself */
 }
 
 .ownMessage {
-    flex-direction: row-reverse;
+    flex-direction: row-reverse; /* Reverses avatar and content order */
+    /* No margin-left: auto or margin-right: 0 here */
 }
 
 .avatarContainer {
@@ -27,11 +29,12 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    max-width: 70%;
+    max-width: 100%; /* Allow content to fill the messageContainer's width; previously 70% */
+                     /* The actual text block width is now primarily controlled by messageContainer's max-width */
 }
 
 .ownMessage .contentContainer {
-    align-items: flex-end;
+    align-items: flex-end; /* Aligns text to the right within the content container */
 }
 
 .messageBubble {
