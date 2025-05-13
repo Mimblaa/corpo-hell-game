@@ -50,14 +50,14 @@ function App() {
   ];
 
     const defaultChats = [
-      { 
-        id: 1, 
-        name: "Group Chat" 
-      },
-      { 
-        id: 2, 
-        name: "New Chat 2" 
-      },
+      // { 
+      //   id: 1, 
+      //   name: "Group Chat" 
+      // },
+      // { 
+      //   id: 2, 
+      //   name: "New Chat 2" 
+      // },
     ];
   
     const defaultMessages = [

@@ -18,10 +18,6 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
     return notifications.filter((notification) => !notification.isRead).length;
   });
 
-  const [isNotificationSectionVisited, setIsNotificationSectionVisited] = useState(() => {
-    return localStorage.getItem("notificationVisited") === "true";
-  });
-
   useEffect(() => {
     const handleStorageChange = () => {
       const savedNotifications = localStorage.getItem("notifications");
@@ -44,10 +40,6 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
   }, []);
 
   const handleSectionChange = (section) => {
-    if (section === "notification") {
-      setIsNotificationSectionVisited(true);
-      localStorage.setItem("notificationVisited", "true");
-    }
     onSectionChange(section);
   };
 
@@ -56,7 +48,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
       id: "notification",
       icon: notificationIcon,
       label: "Powiadomienia",
-      badge: isNotificationSectionVisited ? unreadCount : 0,
+      badge: unreadCount,
     },
     {
       id: "chat",
