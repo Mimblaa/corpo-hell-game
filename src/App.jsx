@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AppLayout from "./AppLayout";
 import Questionnaire from "./Questionnaire";
+import AvatarPicker from "./AvatarPicker";
 import "./App.css";
 
 import participantAvatar from './assets/icons/user-avatar.png';
@@ -12,6 +13,10 @@ function App() {
   const [isQuestionnaireComplete, setIsQuestionnaireComplete] = useState(() => {
     return !!localStorage.getItem("playerStats");
   });
+  const [isAvatarComplete, setIsAvatarComplete] = useState(() => {
+    return !!localStorage.getItem("playerAvatar");
+  });
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
   const scenarios = [
     {
@@ -465,6 +470,13 @@ function App() {
     localStorage.setItem("events", JSON.stringify(expandedDefaultEvents)); // Save expanded events to localStorage
 
     setIsQuestionnaireComplete(false); // Trigger questionnaire
+    setShowAvatarPicker(true);
+    setIsAvatarComplete(false);
+  };
+
+  const handleAvatarComplete = () => {
+    setIsAvatarComplete(true);
+    setShowAvatarPicker(false);
   };
 
   const handleContinueClick = () => {
@@ -474,7 +486,9 @@ function App() {
   return (
     <div className={isAppVisible ? "app-container" : "start-page"}>
       {!isAppVisible ? (
-        !isQuestionnaireComplete ? (
+        showAvatarPicker ? (
+          <AvatarPicker onComplete={handleAvatarComplete} />
+        ) : !isQuestionnaireComplete ? (
           <Questionnaire onComplete={handleQuestionnaireComplete} />
         ) : (
           <div className="chat-container">
