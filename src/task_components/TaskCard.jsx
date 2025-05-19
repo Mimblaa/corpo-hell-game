@@ -34,10 +34,10 @@ const TaskCard = ({
           )}
           <div className={styles.taskEffects}>
             <p className={styles.effect}>
-              <strong>Efekt:</strong> {effect.attribute} {effect.value > 0 ? `+${effect.value}` : effect.value}
+              <strong>Efekt:</strong> {effect && effect.attribute ? effect.attribute : "-"} {effect && effect.value ? (effect.value > 0 ? `+${effect.value}` : effect.value) : ""}
             </p>
             <p className={styles.penalty}>
-              <strong>Kara:</strong> {penalty.attribute} {penalty.value > 0 ? `+${penalty.value}` : penalty.value}
+              <strong>Kara:</strong> {penalty && penalty.attribute ? penalty.attribute : "-"} {penalty && penalty.value ? (penalty.value > 0 ? `+${penalty.value}` : penalty.value) : ""}
             </p>
           </div>
         </div>
