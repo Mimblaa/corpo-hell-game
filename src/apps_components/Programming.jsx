@@ -6,16 +6,6 @@ const Programming = ({ tasks, setTasks }) => {
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
 
-  const sampleTask = {
-    description: "Która funkcja w JavaScript zwraca sumę dwóch liczb?",
-    options: [
-      { id: "A", text: "function add(a, b) { return a - b; }" },
-      { id: "B", text: "function sum(a, b) { return a + b; }" },
-      { id: "C", text: "function multiply(a, b) { return a * b; }" },
-    ],
-    correctAnswer: "B",
-  };
-
   const handleTaskSelect = (e) => {
     const taskId = parseInt(e.target.value, 10);
     const task = tasks.find((task) => task.id === taskId);
@@ -57,7 +47,24 @@ const Programming = ({ tasks, setTasks }) => {
   };
 
   const handleSubmit = () => {
-    if (selectedTask && selectedAnswer === sampleTask.correctAnswer) {
+    let isCorrect = false;
+    if (selectedTask) {
+      if (selectedTask.correctAnswer && selectedTask.answers && selectedTask.answers.length > 0) {
+        // Accept both: full answer string or just letter (A/B/C)
+        const correct = selectedTask.correctAnswer.trim();
+        const selected = selectedAnswer.trim();
+        // If user selected a letter (A/B/C), check if correctAnswer starts with that letter and a dot
+        if (/^[A-Z]$/.test(selected)) {
+          isCorrect = correct.startsWith(selected + ".");
+        } else {
+          // Otherwise, compare full answer string
+          isCorrect = (selected === correct);
+        }
+      } else {
+        isCorrect = false;
+      }
+    }
+    if (isCorrect) {
       setFeedback("Brawo! Zadanie zostało wykonane poprawnie.");
       updatePlayerStats(selectedTask.effect, selectedTask.penalty); // Update stats
       setTasks((prevTasks) =>
@@ -103,21 +110,38 @@ const Programming = ({ tasks, setTasks }) => {
         {selectedTask && (
           <div className={`${styles.programmingTask} ${styles.enhancedQuestion}`}>
             <h2 className={styles.questionTitle}>Rozwiąż zadanie programistyczne</h2>
-            <p className={styles.questionText}>{sampleTask.description}</p>
-            <div className={styles.optionsContainer}>
-              {sampleTask.options.map((option) => (
-                <label key={option.id} className={styles.enhancedOptionLabel}>
-                  <input
-                    type="radio"
-                    name="programmingQuestion"
-                    value={option.id}
-                    onChange={(e) => setSelectedAnswer(e.target.value)}
-                    className={styles.radioInput}
-                  />
-                  {option.id}. {option.text}
-                </label>
-              ))}
-            </div>
+            <p className={styles.questionText}>
+              {selectedTask.question && selectedTask.question.length > 0
+                ? selectedTask.question
+                : selectedTask.description}
+            </p>
+            {/* Multiple choice answers if available */}
+            {selectedTask.answers && selectedTask.answers.length > 0 ? (
+              <div className={styles.optionsContainer}>
+                {selectedTask.answers.map((ans, idx) => {
+                  // Extract letter (A/B/C) for value if present
+                  let letter = null;
+                  const match = ans.match(/^([A-Z])\./);
+                  if (match) letter = match[1];
+                  return (
+                    <label key={ans} className={styles.enhancedOptionLabel}>
+                      <input
+                        type="radio"
+                        name="programmingQuestion"
+                        value={letter || ans}
+                        onChange={(e) => setSelectedAnswer(e.target.value)}
+                        className={styles.radioInput}
+                      />
+                      {ans}
+                    </label>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{ color: '#888', fontStyle: 'italic', marginBottom: 12 }}>
+                (Brak wariantów odpowiedzi do tego zadania)
+              </div>
+            )}
             <button onClick={handleSubmit} className={`${styles.submitButton} ${styles.enhancedButton}`}>
               Akceptuj
             </button>

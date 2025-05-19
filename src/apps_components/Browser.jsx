@@ -3,11 +3,8 @@ import styles from "./AppsSection.module.css";
 import { addNotification } from "../notification_components/NotificationSection";
 
 const Browser = ({ tasks, setTasks }) => {
-  const [generalQuestion] = useState({
-    question: "Jakie jest największe zwierzę na świecie?",
-    options: ["A. Słoń afrykański", "B. Płetwal błękitny", "C. Rekin wielorybi"],
-    answer: "B",
-  });
+  // Use task.question/answers/correctAnswer if available, otherwise fallback
+  const [generalQuestion, setGeneralQuestion] = useState(null);
   const [generalAnswer, setGeneralAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
@@ -18,6 +15,19 @@ const Browser = ({ tasks, setTasks }) => {
     setSelectedTask(task);
     setFeedback("");
     setGeneralAnswer("");
+    if (task && task.question && Array.isArray(task.answers) && task.answers.length > 0 && task.correctAnswer) {
+      setGeneralQuestion({
+        question: task.question,
+        options: task.answers,
+        answer: task.correctAnswer,
+      });
+    } else {
+      setGeneralQuestion({
+        question: "Jakie jest największe zwierzę na świecie?",
+        options: ["A. Słoń afrykański", "B. Płetwal błękitny", "C. Rekin wielorybi"],
+        answer: "B",
+      });
+    }
   };
 
   const handleTaskCompletion = (task) => {
@@ -26,20 +36,22 @@ const Browser = ({ tasks, setTasks }) => {
   
 
   const handleSubmit = () => {
-    if (selectedTask && generalAnswer === generalQuestion.answer) {
-      setFeedback("Brawo! Poprawna odpowiedź.");
-      updatePlayerStats(selectedTask.effect, selectedTask.penalty);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => {
-          if (task.id === selectedTask.id) {
-        handleTaskCompletion(task);
-        return { ...task, status: "Ukończone" };
-          }
-          return task;
-        })
-      );
-    } else {
-      setFeedback("Niestety, spróbuj ponownie.");
+    if (selectedTask && generalQuestion) {
+      if (generalAnswer === generalQuestion.answer) {
+        setFeedback("Brawo! Poprawna odpowiedź.");
+        updatePlayerStats(selectedTask.effect, selectedTask.penalty);
+        setTasks((prevTasks) =>
+          prevTasks.map((task) => {
+            if (task.id === selectedTask.id) {
+              handleTaskCompletion(task);
+              return { ...task, status: "Ukończone" };
+            }
+            return task;
+          })
+        );
+      } else {
+        setFeedback("Niestety, spróbuj ponownie.");
+      }
     }
   };
 
@@ -115,7 +127,7 @@ const Browser = ({ tasks, setTasks }) => {
         )}
 
         {/* General Knowledge Question */}
-        {selectedTask && (
+        {selectedTask && generalQuestion && (
           <div className={`${styles.generalQuestion} ${styles.enhancedQuestion}`}>
             <h2 className={styles.questionTitle}>Pytanie z wiedzy ogólnej</h2>
             <p className={styles.questionText}>{generalQuestion.question}</p>
@@ -125,7 +137,8 @@ const Browser = ({ tasks, setTasks }) => {
                   <input
                     type="radio"
                     name="generalQuestion"
-                    value={option[0]}
+                    value={option}
+                    checked={generalAnswer === option}
                     onChange={(e) => setGeneralAnswer(e.target.value)}
                     className={styles.radioInput}
                   />

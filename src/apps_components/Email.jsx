@@ -3,10 +3,7 @@ import styles from "./AppsSection.module.css";
 import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Email = ({ tasks, setTasks }) => {
-  const [emailTask] = useState({
-    recipient: "Jan Kowalski",
-    message: "Cześć, jak się masz?",
-  });
+  const [emailTask, setEmailTask] = useState({ recipient: "Jan Kowalski", message: "Cześć, jak się masz?" });
   const [recipient, setRecipient] = useState("");
   const [message, setMessage] = useState("");
   const [feedback, setFeedback] = useState("");
@@ -79,6 +76,15 @@ const Email = ({ tasks, setTasks }) => {
     setFeedback(""); // Reset feedback when switching tasks
     setRecipient("");
     setMessage("");
+    // Use question as message, answers[0] as recipient if available
+    if (task && task.question) {
+      setEmailTask({
+        recipient: (Array.isArray(task.answers) && task.answers.length > 0) ? task.answers[0] : "Jan Kowalski",
+        message: task.question,
+      });
+    } else {
+      setEmailTask({ recipient: "Jan Kowalski", message: "Cześć, jak się masz?" });
+    }
   };
 
   const handleCloseFeedback = () => {

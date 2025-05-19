@@ -122,6 +122,9 @@ const Drawing = ({ tasks, setTasks }) => {
                 <h4 className={styles.taskTitle}>Wybrane zadanie:</h4>
                 <p><strong>Tytuł:</strong> {selectedTask.title}</p>
                 <p><strong>Opis:</strong> {selectedTask.description}</p>
+                {selectedTask.question && (
+                  <p><strong>Polecenie:</strong> {selectedTask.question}</p>
+                )}
               </div>
             )}
             <canvas

@@ -120,6 +120,9 @@ const ChatList = ({ onSelectChat, activeChatId, chats, onUpdateChatName, onAddCh
                 onDoubleClick={() => handleEditChatName(chat.id)}
               >
                 {chat.name}
+                {chat.unreadCount > 0 && (
+                  <span className={styles.unreadBadge}>{chat.unreadCount}</span>
+                )}
               </span>
             )}
           </div>

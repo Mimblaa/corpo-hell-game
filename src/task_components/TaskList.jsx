@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./TaskSection.module.css";
 import TaskGroup from "./TaskGroup";
 
-const TaskList = ({ tasks, filter, onComplete }) => {
+const TaskList = ({ tasks, filter, onComplete, onTaskClick }) => {
   const filteredTasks = filter ? tasks.filter(filter) : tasks;
   const taskGroups = filteredTasks.reduce((acc, task) => {
     const date = task.dueDate.split("T")[0];
@@ -39,6 +39,7 @@ const TaskList = ({ tasks, filter, onComplete }) => {
             day={group.day}
             tasks={group.tasks}
             onComplete={onComplete}
+            onTaskClick={onTaskClick}
           />
         ))}
       </div>
