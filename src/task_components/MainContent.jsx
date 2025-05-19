@@ -40,25 +40,25 @@ const MainContent = () => {
     let prompt = "";
     switch (aiType) {
       case "Calculator":
-        prompt = 'Wymyśl krótkie zadanie matematyczne (np. oblicz sumę, iloczyn, procenty, równanie). Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Oblicz 15% z 240","effect":{"attribute":"Efektywność","value":2},"penalty":{"attribute":"Stres","value":-1}}. Tytuł ma być konkretny, nie ogólny.';
+        prompt = 'Wymyśl krótkie zadanie matematyczne (np. oblicz sumę, iloczyn, procenty, równanie). Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania (np. Oblicz 15% z 240)","answers":["36","24","15","30"],"correctAnswer":"36","effect":{"attribute":"Efektywność","value":2},"penalty":{"attribute":"Stres","value":-1}}. Tytuł i question mają być konkretne, nie ogólne. Odpowiedzi mają być różne, tylko jedna poprawna.';
         break;
       case "Notebook":
-        prompt = 'Wymyśl zadanie polegające na sporządzeniu notatki z projektu, spotkania lub innego wydarzenia. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opisz przebieg spotkania zespołu projektowego...","effect":{"attribute":"Reputacja","value":1},"penalty":{"attribute":"Cierpliwość","value":-1}}. Tytuł ma być konkretny, nie ogólny.';
+        prompt = 'Wymyśl zadanie polegające na sporządzeniu notatki z projektu, spotkania lub innego wydarzenia. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania (np. Opisz przebieg spotkania zespołu projektowego)","answers":[],"correctAnswer":"","effect":{"attribute":"Reputacja","value":1},"penalty":{"attribute":"Cierpliwość","value":-1}}. Tytuł i question mają być konkretne, nie ogólne.';
         break;
       case "Browser":
-        prompt = 'Wymyśl krótkie zadanie polegające na wyszukaniu wiedzy ogólnej (np. ciekawostka, pytanie do sprawdzenia w internecie). Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Znajdź stolicę Kanady","effect":{"attribute":"Produktywność Teatralna","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł ma być konkretny, nie ogólny.';
+        prompt = 'Wymyśl krótkie zadanie polegające na wyszukaniu wiedzy ogólnej (np. ciekawostka, pytanie do sprawdzenia w internecie). Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania (np. Znajdź stolicę Kanady)","answers":["Ottawa","Toronto","Vancouver","Montreal"],"correctAnswer":"Ottawa","effect":{"attribute":"Produktywność Teatralna","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł i question mają być konkretne, nie ogólne. Odpowiedzi mają być różne, tylko jedna poprawna.';
         break;
       case "Mail":
-        prompt = 'Wymyśl zadanie polegające na odpisaniu na maila. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Odpowiedz na maila z prośbą o raport","effect":{"attribute":"Zaufanie Szefa","value":2},"penalty":{"attribute":"Stres","value":-1}}. Tytuł ma być konkretny, nie ogólny.';
+        prompt = 'Wymyśl zadanie polegające na odpisaniu na maila. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania (np. Odpowiedz na maila z prośbą o raport)","answers":[],"correctAnswer":"","effect":{"attribute":"Zaufanie Szefa","value":2},"penalty":{"attribute":"Stres","value":-1}}. Tytuł i question mają być konkretne, nie ogólne.';
         break;
       case "Graphics":
-        prompt = 'Wymyśl zadanie polegające na wymyśleniu tematu do obrazka/grafiki. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Wymyśl temat do ilustracji: ...","effect":{"attribute":"Cwaniactwo","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł ma być konkretny, nie ogólny.';
+        prompt = 'Wymyśl zadanie polegające na wymyśleniu tematu do obrazka/grafiki. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania (np. Wymyśl temat do ilustracji: ...)","answers":[],"correctAnswer":"","effect":{"attribute":"Cwaniactwo","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł i question mają być konkretne, nie ogólne.';
         break;
       case "Programming":
-        prompt = 'Wymyśl proste zadanie programistyczne (np. napisz funkcję, która odwraca tekst). Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Napisz funkcję, która odwraca tekst","effect":{"attribute":"Efektywność","value":2},"penalty":{"attribute":"Stres","value":-1}}. Tytuł ma być konkretny, nie ogólny.';
+        prompt = `Wymyśl proste zadanie programistyczne z trzema wariantami odpowiedzi (A, B, C) w stylu quizu ABC. Odpowiedz wyłącznie poprawnym, minimalnym JSON (bez komentarzy, bez przecinków na końcu linii, bez dodatkowego tekstu przed i po JSON). Każde pole w JSON musi dotyczyć tego samego zadania. Przykład: {"title":"Zamiana wielkości liter w tekście","description":"Napisz funkcję, która zamienia wszystkie litery w podanym tekście na przeciwne wielkości (małe na wielkie i wielkie na małe).","question":"Która z poniższych funkcji zamienia wielkość liter w tekście?","answers":["A. function swapCase(str) { return str.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('') }","B. function swapCase(str) { return str }","C. function swapCase(str) { return str.toUpperCase() }"],"correctAnswer":"A. function swapCase(str) { return str.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join('') }","effect":{"attribute":"Efektywność","value":2},"penalty":{"attribute":"Stres","value":-1}}. Tytuł, opis, question i odpowiedzi muszą dotyczyć tego samego zadania. Odpowiedzi mają być różne, tylko jedna poprawna. Odpowiedzi mają być w formacie A. ..., B. ..., C. ...`;
         break;
       default:
-        prompt = 'Wymyśl zadanie do wykonania w pracy biurowej. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","effect":{"attribute":"Reputacja","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł ma być konkretny, nie ogólny.';
+        prompt = 'Wymyśl zadanie do wykonania w pracy biurowej. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania","answers":[],"correctAnswer":"","effect":{"attribute":"Reputacja","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł i question mają być konkretne, nie ogólne.';
     }
     try {
       const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
@@ -120,6 +120,9 @@ const MainContent = () => {
           aiType === "Graphics" ? "Grafika" :
           aiType === "Programming" ? "Programowanie" :
           "Inne",
+        question: taskData.question || "",
+        answers: taskData.answers || [],
+        correctAnswer: taskData.correctAnswer || "",
       };
       setTasks((prev) => [...prev, newTask]);
     } catch (e) {

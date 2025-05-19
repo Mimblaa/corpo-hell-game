@@ -3,9 +3,7 @@ import styles from "./AppsSection.module.css";
 import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Notepad = ({ tasks, setTasks }) => {
-  const [transcriptionTask] = useState(
-    "Przepisz ten tekst dokładnie: 'Witaj w Notatniku!'"
-  );
+  const [transcriptionTask, setTranscriptionTask] = useState("");
   const [userText, setUserText] = useState("");
   const [feedback, setFeedback] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
@@ -19,6 +17,12 @@ const Notepad = ({ tasks, setTasks }) => {
       setShowTranscription(true);
       setUserText("");
       setFeedback("");
+      // Use question if available, otherwise fallback
+      if (task && task.question) {
+        setTranscriptionTask(task.question);
+      } else {
+        setTranscriptionTask("Przepisz ten tekst dokładnie: 'Witaj w Notatniku!'");
+      }
     }
   };
 
@@ -64,7 +68,15 @@ const Notepad = ({ tasks, setTasks }) => {
   };
 
   const handleSubmit = () => {
-    const expectedText = transcriptionTask.split(": ")[1].replace(/'/g, "").trim();
+    // For custom tasks, expected text is after colon or just the question
+    let expectedText = "";
+    if (selectedTask && selectedTask.question) {
+      // Try to extract after colon, or use whole question
+      const parts = selectedTask.question.split(": ");
+      expectedText = parts.length > 1 ? parts[1].replace(/'/g, "").trim() : selectedTask.question.trim();
+    } else {
+      expectedText = "Witaj w Notatniku!";
+    }
     if (selectedTask && userText.trim() === expectedText) {
       setFeedback("Brawo! Poprawnie przepisałeś tekst.");
       updatePlayerStats(selectedTask.effect, selectedTask.penalty); // Update stats

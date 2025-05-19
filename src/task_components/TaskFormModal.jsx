@@ -31,6 +31,9 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
     files: [],
     effect: { attribute: "", value: "" },
     penalty: { attribute: "", value: "" },
+    question: "",
+    answers: [],
+    correctAnswer: "",
   });
 
   const handleChange = (e) => {
@@ -38,6 +41,15 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  // For answers (comma separated)
+  const handleAnswersChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      answers: value.split(",").map((a) => a.trim()).filter((a) => a.length > 0),
     }));
   };
 
@@ -84,6 +96,9 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
       files: [],
       effect: { attribute: "", value: "" },
       penalty: { attribute: "", value: "" },
+      question: "",
+      answers: [],
+      correctAnswer: "",
     });
     onClose();
   };
@@ -185,6 +200,36 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, description: e.target.value }))
               }
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Polecenie (question)</label>
+            <input
+              type="text"
+              value={formData.question}
+              onChange={(e) => setFormData((prev) => ({ ...prev, question: e.target.value }))}
+              className={styles.input}
+              placeholder="Polecenie do wykonania (np. Oblicz 15% z 240)"
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Odpowiedzi (answers, oddzielone przecinkami)</label>
+            <input
+              type="text"
+              value={formData.answers.join(", ")}
+              onChange={handleAnswersChange}
+              className={styles.input}
+              placeholder="np. 36, 24, 15, 30"
+            />
+          </div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Poprawna odpowiedź (correctAnswer)</label>
+            <input
+              type="text"
+              value={formData.correctAnswer}
+              onChange={(e) => setFormData((prev) => ({ ...prev, correctAnswer: e.target.value }))}
+              className={styles.input}
+              placeholder="np. 36"
             />
           </div>
           <div className={styles.formGroup}>

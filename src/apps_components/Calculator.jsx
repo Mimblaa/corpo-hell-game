@@ -3,10 +3,19 @@ import styles from "./AppsSection.module.css";
 import { addNotification } from "../notification_components/NotificationSection"; // Import notification function
 
 const Calculator = ({ tasks, setTasks }) => {
-  const generateMathProblem = () => {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    return { question: `${num1} + ${num2} = ?`, answer: num1 + num2 };
+  // If task has question/answers/correctAnswer, use them, otherwise fallback to random
+  const generateMathProblem = (task) => {
+    if (task && task.question && task.answers && task.correctAnswer) {
+      return {
+        question: task.question,
+        answers: task.answers,
+        correctAnswer: task.correctAnswer,
+      };
+    } else {
+      const num1 = Math.floor(Math.random() * 10) + 1;
+      const num2 = Math.floor(Math.random() * 10) + 1;
+      return { question: `${num1} + ${num2} = ?`, answer: num1 + num2 };
+    }
   };
 
   const [selectedTask, setSelectedTask] = useState(null);
@@ -18,7 +27,7 @@ const Calculator = ({ tasks, setTasks }) => {
     const taskId = parseInt(e.target.value, 10); // Ensure taskId is a number
     const task = tasks.find((task) => task.id === taskId);
     setSelectedTask(task);
-    setMathProblem(generateMathProblem());
+    setMathProblem(generateMathProblem(task));
     setFeedback("");
     setUserAnswer("");
   };
@@ -60,21 +69,42 @@ const Calculator = ({ tasks, setTasks }) => {
   };
 
   const handleSubmit = () => {
-    console.log(selectedTask);
-    if (selectedTask && parseInt(userAnswer, 10) === mathProblem.answer) {
-      setFeedback("Brawo! Poprawna odpowiedź.");
-      updatePlayerStats(selectedTask.effect, selectedTask.penalty); // Update stats
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => {
-          if (task.id === selectedTask.id) {
-            handleTaskCompletion(task);
-            return { ...task, status: "Ukończone" };
-          }
-          return task;
-        })
-      );
-    } else {
-      setFeedback("Niestety, spróbuj ponownie.");
+    if (selectedTask && mathProblem) {
+      // If task has correctAnswer, compare as string
+      if (mathProblem.correctAnswer !== undefined) {
+        if (userAnswer.trim() === String(mathProblem.correctAnswer).trim()) {
+          setFeedback("Brawo! Poprawna odpowiedź.");
+          updatePlayerStats(selectedTask.effect, selectedTask.penalty); // Update stats
+          setTasks((prevTasks) =>
+            prevTasks.map((task) => {
+              if (task.id === selectedTask.id) {
+                handleTaskCompletion(task);
+                return { ...task, status: "Ukończone" };
+              }
+              return task;
+            })
+          );
+        } else {
+          setFeedback("Niestety, spróbuj ponownie.");
+        }
+      } else if (mathProblem.answer !== undefined) {
+        // fallback for old tasks
+        if (parseInt(userAnswer, 10) === mathProblem.answer) {
+          setFeedback("Brawo! Poprawna odpowiedź.");
+          updatePlayerStats(selectedTask.effect, selectedTask.penalty); // Update stats
+          setTasks((prevTasks) =>
+            prevTasks.map((task) => {
+              if (task.id === selectedTask.id) {
+                handleTaskCompletion(task);
+                return { ...task, status: "Ukończone" };
+              }
+              return task;
+            })
+          );
+        } else {
+          setFeedback("Niestety, spróbuj ponownie.");
+        }
+      }
     }
   };
 
@@ -114,12 +144,31 @@ const Calculator = ({ tasks, setTasks }) => {
           <div className={`${styles.mathProblem} ${styles.enhancedQuestion}`}>
             <h2 className={styles.questionTitle}>Rozwiąż zadanie matematyczne</h2>
             <p className={styles.questionText}>{mathProblem.question}</p>
-            <input
-              type="number"
-              value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
-              className={styles.input}
-            />
+            {/* Jeśli są odpowiedzi, pokaż jako radio, jeśli nie, input */}
+            {Array.isArray(mathProblem.answers) && mathProblem.answers.length > 0 ? (
+              <div className={styles.optionsContainer}>
+                {mathProblem.answers.map((ans, idx) => (
+                  <label key={idx} className={styles.enhancedOptionLabel}>
+                    <input
+                      type="radio"
+                      name="mathQuestion"
+                      value={ans}
+                      checked={userAnswer === ans}
+                      onChange={(e) => setUserAnswer(e.target.value)}
+                      className={styles.radioInput}
+                    />
+                    {ans}
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <input
+                type="text"
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                className={styles.input}
+              />
+            )}
             <button onClick={handleSubmit} className={`${styles.submitButton} ${styles.enhancedButton}`}>
               Akceptuj
             </button>
