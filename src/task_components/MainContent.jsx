@@ -28,6 +28,7 @@ const MainContent = () => {
       id: Date.now(),
       ...taskData,
       status: "Nie przesłano",
+      isNew: true,
     };
 
     setTasks((prevTasks) => [...prevTasks, newTask]);
@@ -123,6 +124,7 @@ const MainContent = () => {
         question: taskData.question || "",
         answers: taskData.answers || [],
         correctAnswer: taskData.correctAnswer || "",
+        isNew: true,
       };
       setTasks((prev) => [...prev, newTask]);
     } catch (e) {

@@ -72,7 +72,10 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    // Dodaj pole isNew do zadania
+    const newTaskData = { ...formData, isNew: true };
+    onSubmit(newTaskData);
 
     const isEdit = !!formData.id;
     addNotification(
@@ -83,7 +86,8 @@ const TaskFormModal = ({ isOpen, onClose, onSubmit }) => {
 
     const savedTasks = localStorage.getItem("tasks");
     const tasks = savedTasks ? JSON.parse(savedTasks) : [];
-    const updatedTasks = [...tasks, { id: Date.now(), ...formData }];
+
+    const updatedTasks = [...tasks, { id: Date.now(), ...formData, isNew: true }];
     localStorage.setItem("tasks", JSON.stringify(updatedTasks));
 
     setFormData({

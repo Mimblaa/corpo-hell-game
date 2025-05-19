@@ -92,15 +92,21 @@ const ChatSection = ({ onChangeSection }) => {
   });
 
   const [messages, setMessages] = useState(() => {
-    const savedMessages = localStorage.getItem("messages");
-    try {
-      const parsedMessages = savedMessages ? JSON.parse(savedMessages) : null;
-      return Array.isArray(parsedMessages) ? parsedMessages : []; // Ensure it's an array
-    } catch (error) {
-      console.error("Failed to parse messages from localStorage:", error);
-      return []; // Default to empty array on error
-    }
-  });
+  const savedMessages = localStorage.getItem("messages");
+  try {
+    let parsedMessages = savedMessages ? JSON.parse(savedMessages) : null;
+    if (!Array.isArray(parsedMessages)) return [];
+    return parsedMessages;
+  } catch (error) {
+    console.error("Failed to parse messages from localStorage:", error);
+    return [];
+  }
+});
+  // Liczba nieprzeczytanych wiadomości na czat
+  const getUnreadCountForChat = (chatId) => {
+    return messages.filter((msg) => msg.chatId === chatId && msg.isUnread).length;
+  };
+
 
   const [isAiTyping, setIsAiTyping] = useState(false);
 
@@ -303,7 +309,11 @@ const ChatSection = ({ onChangeSection }) => {
     };
     setMessages((prevMessages) => {
       const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
-      return [...currentMessages, userMessageToSend];
+      // Mark all new incoming messages as unread for other chats
+      return [
+        ...currentMessages,
+        { ...userMessageToSend, isUnread: false },
+      ];
     });
 
     // If the message is from the user (not an AI-triggered one via special button), let the AI reply
@@ -337,7 +347,10 @@ const ChatSection = ({ onChangeSection }) => {
           avatar: participantAvatar,
           isAI: true,
         };
-        setMessages((prevMessages) => [...prevMessages, aiReplyMessage]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { ...aiReplyMessage, isUnread: true },
+        ]);
         
         try {
             const notificationMessage = `Nowa odpowiedź w czacie "${selectedChat.name}": ${aiReplyText.substring(0, 30)}...`;
@@ -352,9 +365,29 @@ const ChatSection = ({ onChangeSection }) => {
   return (
     <>
       <ChatList
-        onSelectChat={setSelectedChatId}
+        onSelectChat={(chatId) => {
+          setSelectedChatId(chatId);
+          // Mark all messages in this chat as read and persist to localStorage
+          setMessages((prev) => {
+            const updated = prev.map(msg =>
+              msg.chatId === chatId ? { ...msg, isUnread: false } : msg
+            );
+            // Persist to localStorage immediately
+            setTimeout(() => {
+              try {
+                localStorage.setItem("messages", JSON.stringify(updated));
+              } catch (e) {
+                console.error("Failed to persist messages to localStorage after marking as read:", e);
+              }
+            }, 0);
+            return updated;
+          });
+        }}
         activeChatId={selectedChatId}
-        chats={chats}
+        chats={chats.map(chat => ({
+          ...chat,
+          unreadCount: getUnreadCountForChat(chat.id)
+        }))}
         onUpdateChatName={handleUpdateChatName}
         onAddChat={handleAddChat}
         onDeleteChat={handleDeleteChat}
@@ -365,7 +398,7 @@ const ChatSection = ({ onChangeSection }) => {
         messages={messages.filter((message) => message.chatId === selectedChatId)}
         onSendMessage={(newMessageText, isAI) => handleSendMessage(selectedChatId, { message: newMessageText, isAI })}
         onChangeSection={onChangeSection}
-        isAiTyping={isAiTyping && selectedChatId === (messages.filter(m => m.chatId === selectedChatId).slice(-1)[0]?.chatId)} // Show typing only for current chat
+        isAiTyping={isAiTyping && selectedChatId === (messages.filter(m => m.chatId === selectedChatId).slice(-1)[0]?.chatId)}
       />
     </>
   );

@@ -10,15 +10,16 @@ const TaskCard = ({
   tags,
   effect,
   penalty,
+  isNew,
 }) => {
-
   return (
     <>
-      <div
-        className={`${styles.taskCard} ${styles[`priority${priority}`]}`}
-      >
+      <div className={`${styles.taskCard} ${styles[`priority${priority}`]}`}>
         <div className={styles.taskContent}>
-          <h3 className={styles.taskTitle}>{title}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <h3 className={styles.taskTitle}>{title}</h3>
+            {isNew && <span className={styles.newBadge}>Nowe</span>}
+          </div>
           <p className={styles.taskTime}>
             Termin: {new Date(dueDate).toLocaleString("pl-PL")}
           </p>
