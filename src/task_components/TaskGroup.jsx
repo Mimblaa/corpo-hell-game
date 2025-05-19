@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./TaskSection.module.css";
 import TaskCard from "./TaskCard";
 
-const TaskGroup = ({ date, day, tasks, onComplete }) => {
+const TaskGroup = ({ date, day, tasks, onComplete, onTaskClick }) => {
   return (
     <article className={styles.taskGroup}>
       <header className={styles.taskGroupHeader}>
@@ -14,6 +14,7 @@ const TaskGroup = ({ date, day, tasks, onComplete }) => {
           key={index}
           {...task}
           onComplete={() => onComplete(task.id)}
+          onClick={() => onTaskClick && onTaskClick(task.id)}
         />
       ))}
     </article>

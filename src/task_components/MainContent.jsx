@@ -6,6 +6,16 @@ import TaskList from "./TaskList";
 import TaskFormModal from "./TaskFormModal";
 import { TabType } from "./types";
 
+
+const AI_TYPES = [
+  "Calculator",
+  "Notebook",
+  "Browser",
+  "Mail",
+  "Graphics",
+  "Programming"
+];
+
 const MainContent = () => {
 
   const [activeTab, setActiveTab] = useState(TabType.UPCOMING);
@@ -142,6 +152,17 @@ const MainContent = () => {
     );
   };
 
+  // Mark a task as read (isNew: false) when clicked
+  const handleTaskClick = (taskId) => {
+    setTasks((prevTasks) => {
+      const updated = prevTasks.map((task) =>
+        task.id === taskId ? { ...task, isNew: false } : task
+      );
+      localStorage.setItem("tasks", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case TabType.UPCOMING:
@@ -152,6 +173,7 @@ const MainContent = () => {
               new Date(task.dueDate) >= new Date() && task.status !== "Ukończone"
             }
             onComplete={handleCompleteTask}
+            onTaskClick={handleTaskClick}
           />
         );
       case TabType.OVERDUE:
@@ -162,6 +184,7 @@ const MainContent = () => {
               new Date(task.dueDate) < new Date() && task.status !== "Ukończone"
             }
             onComplete={handleCompleteTask}
+            onTaskClick={handleTaskClick}
           />
         );
       case TabType.COMPLETED:
@@ -169,10 +192,11 @@ const MainContent = () => {
           <TaskList
             tasks={tasks}
             filter={(task) => task.status === "Ukończone"}
+            onTaskClick={handleTaskClick}
           />
         );
       default:
-        return <TaskList tasks={tasks} />;
+        return <TaskList tasks={tasks} onTaskClick={handleTaskClick} />;
     }
   };
 

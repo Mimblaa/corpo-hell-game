@@ -3,6 +3,9 @@ import React from "react";
 import styles from "./TaskSection.module.css";
 import MainContent from "./MainContent";
 
+
+
+
 const TaskSection = () => {
   return (
     <>
@@ -11,7 +14,7 @@ const TaskSection = () => {
         rel="stylesheet"
       />
       <main className={styles.container}>
-                <MainContent />
+        <MainContent />
       </main>
     </>
   );

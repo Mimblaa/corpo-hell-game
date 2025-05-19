@@ -45,38 +45,6 @@ const ContentHeader = ({ activeTab, onTabChange, onAddTask, onAddAiTask }) => {
             />
             <span>Nowe zadanie</span>
           </button>
-          <button
-            className={styles.newTaskButton}
-            style={{ borderRadius: "0 4px 4px 0", marginLeft: 0 }}
-            onClick={() => setShowAiMenu((v) => !v)}
-            type="button"
-          >
-            <img
-              src={require("../assets/icons/notes.svg")}
-              alt="AI"
-              width="17"
-              height="17"
-            />
-            <span>AI</span>
-          </button>
-          {showAiMenu && (
-            <div className={styles.aiTaskMenu}>
-              {aiTypes.map((ai) => (
-                <button
-                  key={ai.type}
-                  className={styles.aiTaskMenuItem}
-                  onClick={() => {
-                    setShowAiMenu(false);
-                    onAddAiTask(ai.type);
-                  }}
-                  type="button"
-                >
-                  <img src={ai.icon} alt={ai.label} width="16" height="16" style={{ marginRight: 6 }} />
-                  {ai.label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </header>

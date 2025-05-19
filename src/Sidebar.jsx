@@ -42,14 +42,6 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
 
   const handleSectionChange = (section) => {
     onSectionChange(section);
-    // Jeśli przechodzimy do sekcji zadań, oznacz wszystkie zadania jako przeczytane (isNew: false)
-    if (section === "tasks") {
-      const savedTasks = localStorage.getItem("tasks");
-      const tasks = savedTasks ? JSON.parse(savedTasks) : [];
-      const updatedTasks = tasks.map((task) => ({ ...task, isNew: false }));
-      localStorage.setItem("tasks", JSON.stringify(updatedTasks));
-      setNewTasksCount(0);
-    }
   };
 
   // Liczba nowych zadań

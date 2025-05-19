@@ -11,10 +11,15 @@ const TaskCard = ({
   effect,
   penalty,
   isNew,
+  onClick,
 }) => {
   return (
     <>
-      <div className={`${styles.taskCard} ${styles[`priority${priority}`]}`}>
+      <div
+        className={`${styles.taskCard} ${styles[`priority${priority}`]}`}
+        onClick={onClick}
+        style={{ cursor: onClick ? 'pointer' : undefined }}
+      >
         <div className={styles.taskContent}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <h3 className={styles.taskTitle}>{title}</h3>
