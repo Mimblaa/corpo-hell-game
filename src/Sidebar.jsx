@@ -39,9 +39,43 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
     return () => clearInterval(interval);
   }, []);
 
+
   const handleSectionChange = (section) => {
     onSectionChange(section);
   };
+
+  // Liczba nowych zadań
+  const [newTasksCount, setNewTasksCount] = useState(() => {
+    const savedTasks = localStorage.getItem("tasks");
+    const tasks = savedTasks ? JSON.parse(savedTasks) : [];
+    return tasks.filter((task) => task.isNew).length;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedTasks = localStorage.getItem("tasks");
+      const tasks = savedTasks ? JSON.parse(savedTasks) : [];
+      setNewTasksCount(tasks.filter((task) => task.isNew).length);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Liczba nieprzeczytanych wiadomości ze wszystkich czatów
+  const [unreadChatsCount, setUnreadChatsCount] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const savedMessages = localStorage.getItem("messages");
+      let count = 0;
+      if (savedMessages) {
+        try {
+          const messages = JSON.parse(savedMessages);
+          count = messages.filter((msg) => msg.isUnread).length;
+        } catch {}
+      }
+      setUnreadChatsCount(count);
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
 
   const navItems = [
     {
@@ -54,6 +88,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
       id: "chat",
       icon: chatIcon,
       label: "Czat",
+      badge: unreadChatsCount,
     },
     {
       id: "teams",
@@ -64,6 +99,7 @@ const Sidebar = ({ activeSection, onSectionChange }) => {
       id: "tasks",
       icon: tasksIcon,
       label: "Zadania",
+      badge: newTasksCount,
     },
     {
       id: "calendar",

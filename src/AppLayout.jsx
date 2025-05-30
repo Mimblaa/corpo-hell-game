@@ -4,6 +4,8 @@ import AppHeader from "./AppHeader";
 import Sidebar from "./Sidebar";
 import CalendarSection from "./calendar_components/CalendarSection";
 import TaskSection from "./task_components/TaskSection";
+import GlobalAiTaskGenerator from "./task_components/GlobalAiTaskGenerator";
+import GlobalAiChatGenerator from "./chat_components/GlobalAiChatGenerator";
 import ChatSection from "./chat_components/ChatSection";
 import AppsSection from "./apps_components/AppsSection";
 import OneDriveSection from "./onedrive_components/OneDriveSection";
@@ -59,8 +61,13 @@ const AppLayout = () => {
     }
   };
 
+  // Ustal poziom trudności globalnie (możesz pobierać z ustawień gracza)
+  const difficulty = "hard";
   return (
     <main className={styles.layout}>
+      {/* Generator AI tasków i AI wiadomości działa globalnie */}
+      <GlobalAiTaskGenerator difficulty={difficulty} />
+      <GlobalAiChatGenerator difficulty={difficulty} />
       <AppHeader onSearch={handleSearch} />
       <div className={styles.contentWrapper}>
         <Sidebar
