@@ -4,7 +4,7 @@ import ChatList from "./ChatList";
 import ChatContent from "./ChatContent";
 import { addNotification } from "../notification_components/NotificationSection"; 
 
-import participantAvatar from '../assets/icons/user-avatar.png';
+import companyLogo from '../assets/icons/company-logo.jpg';
 import yourAvatar from '../assets/icons/profile-icon.png';
 
 // Suggested prompt for OpenAI API (model gpt-4o):
@@ -96,7 +96,7 @@ const ChatSection = ({ onChangeSection }) => {
             sender: chat.name, // Use chat name as sender for AI
             message: aiText,
             time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            avatar: participantAvatar,
+            avatar: companyLogo,
             isAI: true,
             chatId: selectedChatId, // Ensure AI message is associated with the current chat
             id: Date.now(),
@@ -182,7 +182,7 @@ const ChatSection = ({ onChangeSection }) => {
       const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
       return [
         ...currentMessages,
-        { ...newMessageData, id: Date.now(), chatId, avatar: newMessageData.isAI ? participantAvatar : yourAvatar },
+        { ...newMessageData, id: Date.now(), chatId, avatar: newMessageData.isAI ? companyLogo : yourAvatar },
       ];
     });
   };
