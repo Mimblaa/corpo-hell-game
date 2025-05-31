@@ -11,7 +11,7 @@ import AppsSection from "./apps_components/AppsSection";
 import OneDriveSection from "./onedrive_components/OneDriveSection";
 import CallsSection from "./calls_components/CallsSection";
 import NotificationSection from "./notification_components/NotificationSection";
-import styles from "./AppLayout.module.css";
+import styles from "./styles/AppLayout.module.css";
 
 const AppLayout = () => {
   const [activeSection, setActiveSection] = useState(() => {

@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import styles from "./AppHeader.module.css";
+import styles from "./styles/AppHeader.module.css";
 
-import logo from './assets/icons/logo.png';
+import logo from './assets/icons/company-logo.jpg';
 import settingsIcon from './assets/icons/more.png';
 import profileIcon from './assets/icons/profile-icon.png';
 import reputationIcon from './assets/icons/icon _reputation.svg';
@@ -79,7 +79,7 @@ const AppHeader = () => {
             tabIndex={0}
           />
           <div className={styles.profileIcon} style={{padding:0, background:'none', width:32, height:32, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer'}} onClick={toggleStatsVisibility} role="button" tabIndex={0}>
-            <UserAvatar size={28} />
+            <UserAvatar size={30} />
           </div>
         </div>
       </header>
