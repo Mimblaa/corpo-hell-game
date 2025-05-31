@@ -11,6 +11,7 @@ const Questionnaire = ({ onComplete }) => {
     const storedQuestions = localStorage.getItem("questionnaireData");
     if (storedQuestions) {
       setQuestions(JSON.parse(storedQuestions));
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     }
   }, []);
 
