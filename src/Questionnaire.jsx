@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import "./App.css";
+import "./styles/App.css";
 
 const Questionnaire = ({ onComplete }) => {
   const [answers, setAnswers] = useState({});

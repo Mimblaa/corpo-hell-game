@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import './AvatarPicker.css';
+import './styles/AvatarPicker.css';
 
 const colorOptions = [
   "#3b2314", "#a0522d", "#d2b48c", "#fff", "#f00", "#ff0", "#0af", "#6a4e35", "#b87333", "#e5c07b"

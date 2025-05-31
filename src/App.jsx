@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import AppLayout from "./AppLayout";
 import Questionnaire from "./Questionnaire";
 import AvatarPicker from "./AvatarPicker";
-import "./App.css";
+import "./styles/App.css";
 
 import participantAvatar from './assets/icons/user-avatar.png';
 import yourAvatar from './assets/icons/profile-icon.png';
