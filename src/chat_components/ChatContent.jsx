@@ -6,7 +6,7 @@ import styles from "./ChatContent.module.css";
 import videoIcon from '../assets/icons/video-icon.png';
 import moreOptionsIcon from '../assets/icons/more-options-participants.png';
 import yourAvatar from '../assets/icons/profile-icon.png';
-import participantAvatar from '../assets/icons/user-avatar.png';
+import participantAvatar from '../assets/icons/company-logo.jpg';
 import { addNotification } from "../notification_components/NotificationSection";
 
 const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChangeSection, isAiTyping }) => {
