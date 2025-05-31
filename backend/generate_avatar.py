@@ -9,11 +9,13 @@ import os
 import logging
 import requests
 import httpx
+from faker import Faker
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+fake_pl = Faker('pl_PL')
 
 app.add_middleware(
     CORSMiddleware,
@@ -144,3 +146,16 @@ async def random_face():
 
     avatar_url = f"chat_avatars/{filename}"
     return {"avatar_url": avatar_url}
+
+@app.get("/random-name")
+async def get_random__name():
+    try:
+        full_name = fake_pl.name()
+        full_name_splited = full_name.split()
+        if len(full_name_splited) < 2:
+            full_name = f'{full_name_splited[-2]} {full_name_splited[-1]}'
+        return {
+            "full_name": full_name,
+        }
+    except Exception as e:
+        return {"error": "Could not generate name"}
