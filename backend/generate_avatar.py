@@ -24,6 +24,8 @@ app.add_middleware(
 )
 
 os.makedirs("generated", exist_ok=True)
+os.makedirs("chat_avatars", exist_ok=True)
+app.mount("/chat_avatars", StaticFiles(directory="chat_avatars"), name="chat_avatars")
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -95,8 +97,6 @@ def generate_avatar(data: AvatarRequest):
     image.save(filepath)
 
     return {"image_url": f"http://localhost:8000/generated/{filename}"}
-
-app.mount("/chat_avatars", StaticFiles(directory="chat_avatars"), name="chat_avatars")
 
 @app.get("/random-face")
 async def random_face():
