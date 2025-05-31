@@ -6,7 +6,7 @@ import styles from "./ChatContent.module.css";
 import videoIcon from '../assets/icons/video-icon.png';
 import moreOptionsIcon from '../assets/icons/more-options-participants.png';
 import yourAvatar from '../assets/icons/profile-icon.png';
-import companyLogo from '../assets/icons/company-logo.jpg';
+import participantAvatar from '../assets/icons/user-avatar.png';
 import { addNotification } from "../notification_components/NotificationSection";
 
 const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChangeSection, isAiTyping }) => {
@@ -39,9 +39,9 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChan
         <div className={styles.participantsInfo}>
           <div className={styles.participants}>
             <img
-              src={companyLogo}
+              src={participantAvatar}
               alt="Participant"
-              className={styles.companyLogo}
+              className={styles.participantAvatar}
             />
             <div className={styles.participantNames}>
               <span className={styles.participantName}>{chatName}</span> {/* Display chat name */}

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./styles/AppHeader.module.css";
 
-import logo from './assets/icons/logo.png';
+import logo from './assets/icons/company-logo.jpg';
 import settingsIcon from './assets/icons/more.png';
 import profileIcon from './assets/icons/profile-icon.png';
 import reputationIcon from './assets/icons/icon _reputation.svg';
