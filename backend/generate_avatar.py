@@ -25,7 +25,10 @@ app.add_middleware(
 
 os.makedirs("generated", exist_ok=True)
 os.makedirs("chat_avatars", exist_ok=True)
+
 app.mount("/chat_avatars", StaticFiles(directory="chat_avatars"), name="chat_avatars")
+
+app.mount("/generated", StaticFiles(directory="generated"), name="generated_early_mount")
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -36,6 +39,7 @@ else:
 
 app.mount("/generated", StaticFiles(directory="generated"), name="generated")
 
+
 model_id = "SG161222/Realistic_Vision_V5.1_noVAE"
 pipe = StableDiffusionPipeline.from_pretrained(
     model_id,
@@ -44,6 +48,24 @@ pipe = StableDiffusionPipeline.from_pretrained(
 )
 pipe = pipe.to(device)
 
+async def cleanup_temporary_files_on_shutdown():
+    logger.info("Application shutdown initiated. Cleaning up temporary files...")
+    directories_to_clean = ["generated", "chat_avatars"]
+    for directory_path in directories_to_clean:
+        if os.path.exists(directory_path):
+            logger.info(f"Cleaning directory: {directory_path}")
+            for filename in os.listdir(directory_path):
+                file_path = os.path.join(directory_path, filename)
+                try:
+                    if os.path.isfile(file_path) or os.path.islink(file_path):
+                        os.unlink(file_path)
+                except Exception as e:
+                    logger.error(f"Failed to delete {file_path}. Reason: {e}")
+        else:
+            logger.warning(f"Directory '{directory_path}' not found during shutdown cleanup, skipping.")
+    logger.info("Temporary files cleanup finished.")
+
+app.add_event_handler("shutdown", cleanup_temporary_files_on_shutdown)
 class AvatarRequest(BaseModel):
     gender: str
     skin_color: str
@@ -85,10 +107,12 @@ def generate_avatar(data: AvatarRequest):
     negative_prompt = (
         "blurry, distorted face, deformed eyes, multiple heads, extra arms, extra fingers, "
         "bad anatomy, out of frame, low quality, low resolution, artifacts, text, watermark, "
-        "oversaturated, unnatural skin, mutated hands, poorly drawn face, glitch"
+        "oversaturated, unnatural skin, mutated hands, poorly drawn face, glitch, ugly, tiling, "
+        "poorly drawn hands, poorly drawn feet, signature, username, error, jpeg artifacts, "
+        "compression artifacts, noise, weird colors, bad art, malformed, missing limbs"
     )
 
-    logger.info(f"Prompt: {prompt}")  # <- To doda
+    logger.info(f"Prompt: {prompt}")
 
     image = pipe(prompt, negative_prompt=negative_prompt, guidance_scale=7.5, num_inference_steps=50).images[0]
 
