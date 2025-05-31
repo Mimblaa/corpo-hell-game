@@ -79,7 +79,7 @@ const AppHeader = () => {
             tabIndex={0}
           />
           <div className={styles.profileIcon} style={{padding:0, background:'none', width:32, height:32, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer'}} onClick={toggleStatsVisibility} role="button" tabIndex={0}>
-            <UserAvatar size={28} />
+            <UserAvatar size={30} />
           </div>
         </div>
       </header>
