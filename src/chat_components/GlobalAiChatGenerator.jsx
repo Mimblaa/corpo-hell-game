@@ -32,10 +32,10 @@ async function fetchOpenAIResponse(apiMessages) {
 
 function getDefaultChats() {
   return [
-    "Kamil Kochan",
-    "Jakub Grelowski",
-    "Joanna Orzeł",
-    "Tomasz Michalski",
+    "Kamil Nienawiść",
+    "Jakub Brukowski",
+    "Joanna Jastrząb",
+    "Tomasz Kamilski",
     "Manager"
   ].map((name, idx) => ({
     id: idx + 1,

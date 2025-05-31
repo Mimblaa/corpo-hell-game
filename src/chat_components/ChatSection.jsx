@@ -22,7 +22,7 @@ async function fetchOpenAIResponse(apiMessages) {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: apiMessages,
-        max_tokens: 100,
+        max_tokens: 100, // Oryginalna wartość
         temperature: 0.7
       })
     });
@@ -46,20 +46,39 @@ const fetchRandomAvatar = async () => {
     const response = await fetch("http://localhost:8000/random-face");
     if (!response.ok) throw new Error("Błąd podczas pobierania JSON-a z backendu");
     const data = await response.json();
+    // Zakładamy, że backend zwraca pełny URL lub ścieżkę, którą trzeba połączyć
+    // W Twoim oryginalnym kodzie było: return `http://localhost:8000/${data.avatar_url}`;
+    // To jest poprawne, jeśli data.avatar_url to np. "chat_avatars/plik.jpg"
     return `http://localhost:8000/${data.avatar_url}`;
   } catch (error) {
     console.error("fetchRandomAvatar error:", error);
-    return "/default-avatar.png";
+    return "/default-avatar.png"; // Upewnij się, że ten plik istnieje w folderze public
   }
 };
 
+// Funkcja do pobierania losowego imienia - zostaje
+const fetchRandomName = async () => {
+  try {
+    const response = await fetch("http://localhost:8000/random-name");
+    if (!response.ok) {
+      console.error("Błąd podczas pobierania nazwy z backendu:", response.status);
+      return null;
+    }
+    const data = await response.json();
+    return data.full_name;
+  } catch (error) {
+    console.error("fetchRandomName error:", error);
+    return null;
+  }
+};
 const ChatSection = ({ onChangeSection }) => {
   const [selectedChatId, setSelectedChatId] = useState(null);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [isChatsLoaded, setIsChatsLoaded] = useState(false);
-  const [isLoadingAvatars, setIsLoadingAvatars] = useState(false);
+  const [isLoadingAvatars, setIsLoadingAvatars] = useState(false); 
+  const [isLoadingNewChat, setIsLoadingNewChat] = useState(false);
 
   useEffect(() => {
     try {
@@ -81,32 +100,35 @@ const ChatSection = ({ onChangeSection }) => {
     if (!isChatsLoaded) return;
     if (chats.length === 0) {
       (async () => {
-        setIsLoadingAvatars(true);
-        const defaultChatNames = [
-          "Kamil Kochan",
-          "Jakub Grelowski",
-          "Joanna Orzeł",
-          "Tomasz Michalski",
-          "Manager"
-        ];
-        let nextId = 1;
-        const newChats = [];
-        for (const name of defaultChatNames) {
-          const avatar = await fetchRandomAvatar();
-          newChats.push({ id: nextId++, name, avatar });
-        }
-        setChats(newChats);
+      setIsLoadingAvatars(true);
+      const defaultChatNames = [
+        "Kamil Nienawiść",
+        "Jakub Brukowski",
+        "Joanna Jastrząb",
+        "Tomasz Kamilski",
+        "Manager"
+      ];
+      let nextId = 1;
+      const newChats = [];
+      for (const name of defaultChatNames) {
+        const avatar = await fetchRandomAvatar();
+        newChats.push({ id: nextId++, name, avatar });
+      }
+      setChats(newChats);
+      if (newChats.length > 0) {
         setSelectedChatId(newChats[0].id);
-        setIsLoadingAvatars(false);
+      }
+      setIsLoadingAvatars(false);
       })();
     }
-  }, [isChatsLoaded, chats.length]);
+    }, [isChatsLoaded, chats.length]);
 
   useEffect(() => {
     if (!isChatsLoaded) return;
     localStorage.setItem("chats", JSON.stringify(chats));
     localStorage.setItem("messages", JSON.stringify(messages));
     if (selectedChatId !== null) localStorage.setItem("selectedChatId", selectedChatId.toString());
+    else localStorage.removeItem("selectedChatId"); 
   }, [chats, messages, selectedChatId, isChatsLoaded]);
 
   const getUnreadCountForChat = (chatId) => messages.filter(msg => msg.chatId === chatId && msg.isUnread).length;
@@ -122,11 +144,21 @@ const ChatSection = ({ onChangeSection }) => {
   };
 
   const handleAddChat = async () => {
+    setIsLoadingNewChat(true);
     const newId = chats.length ? Math.max(...chats.map(c => c.id)) + 1 : 1;
     const avatar = await fetchRandomAvatar();
-    const newChat = { id: newId, name: `New Chat ${newId}`, avatar };
-    setChats([...chats, newChat]);
+    
+    let chatName = `New Chat ${newId}`;
+    const fetchedName = await fetchRandomName();
+    
+    if (fetchedName) {
+      chatName = fetchedName;
+    } 
+
+    const newChat = { id: newId, name: chatName, avatar };
+    setChats(prevChats => [...prevChats, newChat]);
     setSelectedChatId(newId);
+    setIsLoadingNewChat(false);
   };
 
   const handleSendMessage = async (chatId, newMessageData) => {
@@ -186,7 +218,7 @@ const ChatSection = ({ onChangeSection }) => {
 
   const selectedChat = chats.find(c => c.id === selectedChatId);
 
-  if (isLoadingAvatars) {
+  if (isLoadingAvatars) { 
     return (
       <div style={{ padding: "2rem", textAlign: "center" }}>
         <div className="spinner" style={{ marginBottom: "1rem" }} />
@@ -203,13 +235,14 @@ const ChatSection = ({ onChangeSection }) => {
           unreadCount: getUnreadCountForChat(chat.id),
         }))}
         activeChatId={selectedChatId}
-        onSelectChat={id => setSelectedChatId(id)}
+        onSelectChat={id => setSelectedChatId(id)} 
         onAddChat={handleAddChat}
         onDeleteChat={handleDeleteChat}
+        isLoadingNewChat={isLoadingNewChat}
       />
       <ChatContent
         selectedChatId={selectedChatId}
-        chatName={selectedChat?.name || "Unknown Chat"}
+        chatName={selectedChat?.name || "Unknown Chat"} 
         messages={messages.filter(m => m.chatId === selectedChatId)}
         onSendMessage={(msgText, isAI) => handleSendMessage(selectedChatId, { message: msgText, isAI })}
         onChangeSection={onChangeSection}
