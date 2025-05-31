@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import styles from "./AppHeader.module.css";
+import styles from "./styles/AppHeader.module.css";
 
 import logo from './assets/icons/logo.png';
 import settingsIcon from './assets/icons/more.png';

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import styles from "./Sidebar.module.css";
+import styles from "./styles/Sidebar.module.css";
 
 import notificationIcon from './assets/icons/notification-icon.png';
 import chatIcon from './assets/icons/chat-icon.png';
