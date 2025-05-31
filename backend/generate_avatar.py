@@ -7,6 +7,9 @@ from diffusers import StableDiffusionPipeline
 import uuid
 import os
 import logging
+import requests
+from fastapi import FastAPI, Response, HTTPException
+import httpx
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -93,3 +96,28 @@ def generate_avatar(data: AvatarRequest):
     image.save(filepath)
 
     return {"image_url": f"http://localhost:8000/generated/{filename}"}
+
+app.mount("/chat_avatars", StaticFiles(directory="chat_avatars"), name="chat_avatars")
+
+@app.get("/random-face")
+async def random_face():
+    url = "https://thispersondoesnotexist.com/"
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url)
+            response.raise_for_status()
+    except httpx.RequestError as e:
+        raise HTTPException(status_code=503, detail=f"Request error: {e}")
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=response.status_code, detail=f"HTTP error: {e}")
+
+    folder = "chat_avatars"
+    os.makedirs(folder, exist_ok=True)
+
+    filename = f"{uuid.uuid4()}.jpg"
+    filepath = os.path.join(folder, filename)
+    with open(filepath, "wb") as f:
+        f.write(response.content)
+
+    avatar_url = f"chat_avatars/{filename}"
+    return {"avatar_url": avatar_url}
