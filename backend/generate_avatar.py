@@ -59,13 +59,24 @@ class AvatarRequest(BaseModel):
 
 @app.post("/generate-avatar")
 def generate_avatar(data: AvatarRequest):
-    prompt = (
-        f"photorealistic portrait of a {data.gender}, {data.skin_color} skin, "
-        f"{data.hair_color} hair, {data.hairstyle}, {data.accessories}, {data.eye_color} eyes, "
-        f"wearing a {data.shirt_color} shirt, background in {data.background_color}, "
-        "DSLR photo quality, ultra realistic, 8k resolution, cinematic lighting, "
-        "shallow depth of field, highly detailed skin, sharp facial features"
-    )
+    if data.accessories != "none":
+        prompt = (
+            f"A photorealistic portrait of a {data.gender} with {data.skin_color} skin, "
+            f"{data.hair_color} {data.hairstyle} hairstyle, wearing {data.accessories} as accessories, "
+            f"and striking {data.eye_color} eyes. They are dressed in a {data.shirt_color} shirt, "
+            f"set against a {data.background_color} background. "
+            "Captured with DSLR-quality sharpness, ultra-realistic details, 8k resolution, "
+            "cinematic lighting, shallow depth of field, highly detailed skin texture, and sharp facial features."
+        )
+    else:
+        prompt = (
+            f"A photorealistic portrait of a {data.gender} with {data.skin_color} skin, "
+            f"{data.hair_color} {data.hairstyle} hairstyle, "
+            f"and striking {data.eye_color} eyes. They are dressed in a {data.shirt_color} shirt, "
+            f"set against a {data.background_color} background. "
+            "Captured with DSLR-quality sharpness, ultra-realistic details, 8k resolution, "
+            "cinematic lighting, shallow depth of field, highly detailed skin texture, and sharp facial features."
+        )
 
     negative_prompt = (
         "blurry, distorted face, deformed eyes, multiple heads, extra arms, extra fingers, "
