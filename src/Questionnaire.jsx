@@ -69,14 +69,16 @@ const Questionnaire = ({ onComplete }) => {
                   <label>{question.text}</label>
                   {question.options.map((option) => (
                     <div key={option.value}>
-                      <input
-                        type="radio"
-                        name={question.id}
-                        value={option.value}
-                        onChange={handleChange}
-                        required
-                      />{" "}
-                      {option.text}
+                      <label className="radio-label">
+                        <input
+                          type="radio"
+                          name={question.id}
+                          value={option.value}
+                          onChange={handleChange}
+                          required
+                        />
+                        {option.text}
+                      </label>
                     </div>
                   ))}
                 </div>
