@@ -8,7 +8,6 @@ import uuid
 import os
 import logging
 import requests
-from fastapi import FastAPI, Response, HTTPException
 import httpx
 
 logging.basicConfig(level=logging.INFO)
