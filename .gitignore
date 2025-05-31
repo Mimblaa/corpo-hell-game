@@ -140,3 +140,6 @@ venv/
 
 # Py cache
 __pycache__/
+
+generated/
+chat_avatars/

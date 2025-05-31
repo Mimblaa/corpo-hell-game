@@ -9,8 +9,8 @@ const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
 
 async function fetchOpenAIResponse(apiMessages) {
   if (!OPENAI_API_KEY || OPENAI_API_KEY === "your_actual_openai_api_key_here") {
-    console.warn("OpenAI API Key is not set or is using the placeholder value. Please check your .env file and restart the server. Returning a mock response.");
-    return "To jest przykładowa odpowiedź AI, ponieważ klucz API OpenAI nie został skonfigurowany poprawnie w pliku .env.";
+    console.warn("OpenAI API Key is not set. Returning a mock response.");
+    return "To jest przykładowa odpowiedź AI, ponieważ klucz API OpenAI nie został skonfigurowany.";
   }
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -30,14 +30,14 @@ async function fetchOpenAIResponse(apiMessages) {
     if (!response.ok) {
       const errorData = await response.json();
       console.error("OpenAI API Error:", response.status, errorData);
-      return "Przepraszam, mam chwilowe problemy z odpowiedzią. Spróbujmy później.";
+      return "Przepraszam, mam chwilowe problemy z odpowiedzią.";
     }
 
     const data = await response.json();
-    return data.choices[0]?.message?.content.trim() || "Nie udało mi się wygenerować odpowiedzi.";
+    return data.choices[0]?.message?.content.trim() || "Nie udało się wygenerować odpowiedzi.";
   } catch (error) {
     console.error("Error fetching OpenAI response:", error);
-    return "Wystąpił błąd podczas komunikacji z AI. Spróbuj ponownie.";
+    return "Wystąpił błąd podczas komunikacji z AI.";
   }
 }
 
@@ -45,13 +45,8 @@ const fetchRandomAvatar = async () => {
   try {
     const response = await fetch("http://localhost:8000/random-face");
     if (!response.ok) throw new Error("Błąd podczas pobierania JSON-a z backendu");
-
     const data = await response.json();
-    const imageResponse = await fetch(`http://localhost:8000/${data.avatar_url}`);
-    if (!imageResponse.ok) throw new Error("Błąd podczas pobierania obrazu z URL-a");
-
-    const blob = await imageResponse.blob();
-    return URL.createObjectURL(blob);
+    return `http://localhost:8000/${data.avatar_url}`;
   } catch (error) {
     console.error("fetchRandomAvatar error:", error);
     return "/default-avatar.png";
@@ -59,212 +54,119 @@ const fetchRandomAvatar = async () => {
 };
 
 const ChatSection = ({ onChangeSection }) => {
-  const [selectedChatId, setSelectedChatId] = useState(() => {
-    const savedId = localStorage.getItem("selectedChatId");
-    return savedId ? parseInt(savedId, 10) : 1;
-  });
-
+  const [selectedChatId, setSelectedChatId] = useState(null);
   const [chats, setChats] = useState([]);
   const [messages, setMessages] = useState([]);
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const [isChatsLoaded, setIsChatsLoaded] = useState(false);
+  const [isLoadingAvatars, setIsLoadingAvatars] = useState(false);
 
   useEffect(() => {
-    const savedChats = localStorage.getItem("chats");
-    const savedMessages = localStorage.getItem("messages");
-
     try {
-      setChats(savedChats ? JSON.parse(savedChats) : []);
-    } catch {
-      setChats([]);
-    }
-
+      const savedChats = localStorage.getItem("chats");
+      if (savedChats) setChats(JSON.parse(savedChats));
+    } catch (e) {}
     try {
-      setMessages(savedMessages ? JSON.parse(savedMessages) : []);
-    } catch {
-      setMessages([]);
-    }
+      const savedMessages = localStorage.getItem("messages");
+      if (savedMessages) setMessages(JSON.parse(savedMessages));
+    } catch (e) {}
+    try {
+      const savedSelectedChatId = localStorage.getItem("selectedChatId");
+      if (savedSelectedChatId) setSelectedChatId(parseInt(savedSelectedChatId, 10));
+    } catch (e) {}
+    setIsChatsLoaded(true);
   }, []);
 
-  const getUnreadCountForChat = (chatId) => {
-    return messages.filter((msg) => msg.chatId === chatId && msg.isUnread).length;
-  };
-
   useEffect(() => {
-    const defaultChatNames = [
-      "Kamil Kochan",
-      "Jakub Grelowski",
-      "Joanna Orzeł",
-      "Tomasz Michalski",
-      "Manager"
-    ];
-
-    const initChats = async () => {
-      const currentChats = [...chats];
-      let nextId = currentChats.length > 0 ? Math.max(...currentChats.map(chat => chat.id), 0) + 1 : 1;
-      let newChatsAdded = false;
-
-      for (const name of defaultChatNames) {
-        if (!currentChats.some(chat => chat.name === name)) {
+    if (!isChatsLoaded) return;
+    if (chats.length === 0) {
+      (async () => {
+        setIsLoadingAvatars(true);
+        const defaultChatNames = [
+          "Kamil Kochan",
+          "Jakub Grelowski",
+          "Joanna Orzeł",
+          "Tomasz Michalski",
+          "Manager"
+        ];
+        let nextId = 1;
+        const newChats = [];
+        for (const name of defaultChatNames) {
           const avatar = await fetchRandomAvatar();
-          currentChats.push({
-            id: nextId++,
-            name,
-            avatar
-          });
-          newChatsAdded = true;
+          newChats.push({ id: nextId++, name, avatar });
         }
-      }
-
-      if (newChatsAdded) {
-        if (!selectedChatId && currentChats.length > 0 && !localStorage.getItem("selectedChatId")) {
-          setSelectedChatId(currentChats[0].id);
-        }
-        setChats(currentChats);
-      }
-    };
-
-    initChats();
-  }, []);
+        setChats(newChats);
+        setSelectedChatId(newChats[0].id);
+        setIsLoadingAvatars(false);
+      })();
+    }
+  }, [isChatsLoaded, chats.length]);
 
   useEffect(() => {
+    if (!isChatsLoaded) return;
     localStorage.setItem("chats", JSON.stringify(chats));
     localStorage.setItem("messages", JSON.stringify(messages));
-    if (selectedChatId !== null && selectedChatId !== undefined) {
-      localStorage.setItem("selectedChatId", selectedChatId.toString());
+    if (selectedChatId !== null) localStorage.setItem("selectedChatId", selectedChatId.toString());
+  }, [chats, messages, selectedChatId, isChatsLoaded]);
+
+  const getUnreadCountForChat = (chatId) => messages.filter(msg => msg.chatId === chatId && msg.isUnread).length;
+
+  const handleDeleteChat = (chatId) => {
+    const newChats = chats.filter(c => c.id !== chatId);
+    const newMessages = messages.filter(m => m.chatId !== chatId);
+    setChats(newChats);
+    setMessages(newMessages);
+    if (selectedChatId === chatId) {
+      setSelectedChatId(newChats.length > 0 ? newChats[0].id : null);
     }
-  }, [chats, messages, selectedChatId]);
-
-  useEffect(() => {
-    let timerId;
-
-    const sendAIMessageInternal = async () => {
-      const chat = chats.find(c => c.id === selectedChatId);
-      if (!chat) return;
-
-      setIsAiTyping(true);
-
-      const systemPrompt = `Jesteś współpracownikiem w firmie IT. Twoje imię to ${chat.name}. Twoim zadaniem jest prowadzenie naturalnej, krótkiej konwersacji związanej z pracą.`;
-
-      const chatHistoryForProactive = messages
-        .filter(m => m.chatId === selectedChatId)
-        .slice(-4)
-        .map(msg => ({
-          role: msg.isAI || msg.sender !== "You" ? "assistant" : "user",
-          content: msg.message
-        }));
-
-      const proactiveApiMessages = [
-        { role: "system", content: systemPrompt },
-        ...chatHistoryForProactive,
-        { role: "user", content: "Napisz do mnie nową, krótką wiadomość związaną z pracą." }
-      ];
-
-      const aiText = await fetchOpenAIResponse(proactiveApiMessages);
-      setIsAiTyping(false);
-
-      if (aiText) {
-        const newMessage = {
-          sender: chat.name,
-          message: aiText,
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          avatar: chat.avatar,
-          isAI: true,
-          chatId: selectedChatId,
-          id: Date.now(),
-        };
-
-        setMessages(prev => [...prev, newMessage]);
-
-        try {
-          addNotification(`Nowa wiadomość w czacie "${chat.name}": ${aiText.substring(0, 30)}...`);
-        } catch (e) {
-          console.error("Notification error:", e);
-        }
-      }
-    };
-
-    const scheduleNextAIMessage = () => {
-      const randomDelay = Math.random() * (30000 - 10000) + 30000;
-      timerId = setTimeout(async () => {
-        await sendAIMessageInternal();
-        scheduleNextAIMessage();
-      }, randomDelay);
-    };
-
-    if (Array.isArray(chats) && chats.length > 0 && selectedChatId) {
-      scheduleNextAIMessage();
-    }
-
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [selectedChatId, chats, messages]);
-
-  const selectedChat = chats.find((chat) => chat.id === selectedChatId);
-
-  const handleUpdateChatName = (chatId, newName) => {
-    setChats(
-      chats.map((chat) =>
-        chat.id === chatId ? { ...chat, name: newName } : chat
-      )
-    );
   };
 
   const handleAddChat = async () => {
-    const newChatId = chats.length > 0 ? Math.max(...chats.map(chat => chat.id), 0) + 1 : 1;
+    const newId = chats.length ? Math.max(...chats.map(c => c.id)) + 1 : 1;
     const avatar = await fetchRandomAvatar();
-    const newChat = {
-      id: newChatId,
-      name: `New Chat ${newChatId}`,
-      avatar,
-    };
-    setChats((prevChats) => [...prevChats, newChat]);
-    setSelectedChatId(newChat.id);
-  };
-
-  const handleDeleteChat = (chatId) => {
-    setChats(chats.filter((chat) => chat.id !== chatId));
-    setMessages(messages.filter((message) => message.chatId !== chatId));
-    if (selectedChatId === chatId) {
-      setSelectedChatId(chats.length > 1 ? chats[0].id : null);
-    }
+    const newChat = { id: newId, name: `New Chat ${newId}`, avatar };
+    setChats([...chats, newChat]);
+    setSelectedChatId(newId);
   };
 
   const handleSendMessage = async (chatId, newMessageData) => {
-    const userMessageToSend = {
-      ...newMessageData,
+    const userMessage = {
       id: Date.now(),
       chatId,
       sender: "You",
+      message: newMessageData.message,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       avatar: yourAvatar,
+      isAI: newMessageData.isAI,
+      isUnread: false,
     };
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { ...userMessageToSend, isUnread: false },
-    ]);
+    setMessages(prev => [...prev, userMessage]);
 
-    if (!newMessageData.isAI && selectedChat) {
+    if (!newMessageData.isAI) {
       setIsAiTyping(true);
 
-      const systemPromptForReply = `Jesteś współpracownikiem w firmie IT. Twoje imię to ${selectedChat.name}. Odpowiedz na ostatnią wiadomość użytkownika w kontekście prowadzonej rozmowy.`;
+      const selectedChat = chats.find(c => c.id === chatId);
+      if (!selectedChat) {
+        setIsAiTyping(false);
+        return;
+      }
 
-      const chatHistoryForReply = [...messages.filter(m => m.chatId === chatId), userMessageToSend]
+      const systemPrompt = `Jesteś współpracownikiem w firmie IT. Twoje imię to ${selectedChat.name}. Odpowiedz na ostatnią wiadomość użytkownika w kontekście rozmowy.`;
+
+      const chatHistory = [...messages.filter(m => m.chatId === chatId), userMessage]
         .slice(-5)
         .map(msg => ({
           role: msg.isAI || msg.sender !== "You" ? "assistant" : "user",
           content: msg.message
         }));
 
-      const reactiveApiMessages = [
-        { role: "system", content: systemPromptForReply },
-        ...chatHistoryForReply
-      ];
+      const apiMessages = [{ role: "system", content: systemPrompt }, ...chatHistory];
 
-      const aiReplyText = await fetchOpenAIResponse(reactiveApiMessages);
+      const aiReplyText = await fetchOpenAIResponse(apiMessages);
       setIsAiTyping(false);
 
       if (aiReplyText) {
-        const aiReplyMessage = {
+        const aiReply = {
           id: Date.now() + 1,
           chatId,
           sender: selectedChat.name,
@@ -272,54 +174,44 @@ const ChatSection = ({ onChangeSection }) => {
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           avatar: selectedChat.avatar,
           isAI: true,
+          isUnread: true,
         };
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...aiReplyMessage, isUnread: true },
-        ]);
-
+        setMessages(prev => [...prev, aiReply]);
         try {
           addNotification(`Nowa odpowiedź w czacie "${selectedChat.name}": ${aiReplyText.substring(0, 30)}...`);
-        } catch (e) {
-          console.error("Notification error:", e);
-        }
+        } catch (e) {}
       }
     }
   };
 
+  const selectedChat = chats.find(c => c.id === selectedChatId);
+
+  if (isLoadingAvatars) {
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        <div className="spinner" style={{ marginBottom: "1rem" }} />
+        <p>Ładowanie... Proszę czekać</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <ChatList
-        onSelectChat={(chatId) => {
-          setSelectedChatId(chatId);
-          setMessages((prev) => {
-            const updated = prev.map(msg =>
-              msg.chatId === chatId ? { ...msg, isUnread: false } : msg
-            );
-            setTimeout(() => {
-              try {
-                localStorage.setItem("messages", JSON.stringify(updated));
-              } catch (e) {
-                console.error("LocalStorage error:", e);
-              }
-            }, 0);
-            return updated;
-          });
-        }}
-        activeChatId={selectedChatId}
         chats={chats.map(chat => ({
           ...chat,
-          unreadCount: getUnreadCountForChat(chat.id)
+          unreadCount: getUnreadCountForChat(chat.id),
         }))}
-        onUpdateChatName={handleUpdateChatName}
+        activeChatId={selectedChatId}
+        onSelectChat={id => setSelectedChatId(id)}
         onAddChat={handleAddChat}
         onDeleteChat={handleDeleteChat}
       />
       <ChatContent
         selectedChatId={selectedChatId}
         chatName={selectedChat?.name || "Unknown Chat"}
-        messages={messages.filter((message) => message.chatId === selectedChatId)}
-        onSendMessage={(newMessageText, isAI) => handleSendMessage(selectedChatId, { message: newMessageText, isAI })}
+        messages={messages.filter(m => m.chatId === selectedChatId)}
+        onSendMessage={(msgText, isAI) => handleSendMessage(selectedChatId, { message: msgText, isAI })}
         onChangeSection={onChangeSection}
         isAiTyping={isAiTyping && selectedChatId === (messages.filter(m => m.chatId === selectedChatId).slice(-1)[0]?.chatId)}
       />
