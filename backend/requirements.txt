@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic>=1.10.2
+torch
+diffusers
+transformers
+requests
+httpx
