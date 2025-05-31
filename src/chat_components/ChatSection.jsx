@@ -161,20 +161,25 @@ const ChatSection = ({ onChangeSection }) => {
       ];
       
       const createDefaultChats = async () => {
-        let nextId = 1;
+        let nextIdForDefault = 1;
         const newChatsPromises = defaultChatNames.map(async (name) => {
           const avatar = await fetchRandomAvatar();
-          return { id: nextId++, name, avatar };
+          return { name, avatar };
         });
         
         try {
-            const newChats = await Promise.all(newChatsPromises);
-            setChats(newChats);
-            if (newChats.length > 0) {
+            const resolvedChatsData = await Promise.all(newChatsPromises);
+            const newChatsWithIds = resolvedChatsData.map((chatData) => ({
+                id: nextIdForDefault++, 
+                ...chatData
+            }));
+
+            setChats(newChatsWithIds);
+            if (newChatsWithIds.length > 0) {
                 if (!selectedChatId && !localStorage.getItem("selectedChatId")) {
-                    setSelectedChatId(newChats[0].id);
-                } else if (!selectedChatId && localStorage.getItem("selectedChatId") === null && newChats.length > 0){
-                    setSelectedChatId(newChats[0].id);
+                    setSelectedChatId(newChatsWithIds[0].id);
+                } else if (!selectedChatId && localStorage.getItem("selectedChatId") === null && newChatsWithIds.length > 0){
+                    setSelectedChatId(newChatsWithIds[0].id);
                 }
             }
         } catch (error) {
@@ -211,6 +216,27 @@ const ChatSection = ({ onChangeSection }) => {
       localStorage.setItem("messages", JSON.stringify(messages));
     }
   }, [chats, selectedChatId, messages, isChatsLoaded]);
+
+  useEffect(() => {
+    if (selectedChatId !== null && isChatsLoaded) {
+      const hasUnread = messages.some(msg => msg.chatId === selectedChatId && msg.isUnread);
+      if (hasUnread) {
+        setMessages(prevMessages => {
+          const updatedMessages = prevMessages.map(msg =>
+            (msg.chatId === selectedChatId && msg.isUnread)
+              ? { ...msg, isUnread: false }
+              : msg
+          );
+          try {
+            localStorage.setItem("messages", JSON.stringify(updatedMessages));
+          } catch (e) {
+            console.error("Failed to persist messages to localStorage after marking as read:", e);
+          }
+          return updatedMessages;
+        });
+      }
+    }
+  }, [selectedChatId, messages, isChatsLoaded]);
 
   useEffect(() => {
     console.log("[AI Effect] Initializing. selectedChatId:", selectedChatId, "chats:", JSON.stringify(chats.slice(0,2)));
@@ -255,6 +281,10 @@ const ChatSection = ({ onChangeSection }) => {
               isUnread: true,
             };
             
+            if (selectedChatId === newMessage.chatId) {
+                newMessage.isUnread = false;
+            }
+
             console.log("[AI Effect] Preparing to set new AI message:", JSON.stringify(newMessage));
             setMessages((prevMessages) => {
               const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
@@ -262,12 +292,14 @@ const ChatSection = ({ onChangeSection }) => {
               return updated;
             });
 
-            try {
-              const notificationMessage = `Nowa wiadomość w czacie "${chat.name}": ${aiText.substring(0, 30)}...`;
-              addNotification(notificationMessage);
-              console.log("[AI Effect] Notification sent for AI message:", notificationMessage);
-            } catch (e) {
-              console.error("[AI Effect] Error sending notification for AI message:", e);
+            if (newMessage.isUnread) {
+                try {
+                  const notificationMessage = `Nowa wiadomość w czacie "${chat.name}": ${aiText.substring(0, 30)}...`;
+                  addNotification(notificationMessage);
+                  console.log("[AI Effect] Notification sent for AI message:", notificationMessage);
+                } catch (e) {
+                  console.error("[AI Effect] Error sending notification for AI message:", e);
+                }
             }
           } else {
             console.log("[AI Effect] Failed to get AI message text.");
@@ -374,9 +406,7 @@ const ChatSection = ({ onChangeSection }) => {
     });
 
     if (!newMessageData.isAI && selectedChatId && chats.find(c => c.id === selectedChatId)) {
-      const currentChat = chats.find(c => c.id === selectedChatId);
       const selectedChatFromState = chats.find(c => c.id === selectedChatId);
-
 
       if (!selectedChatFromState) {
           setIsAiTyping(false);
@@ -410,7 +440,7 @@ const ChatSection = ({ onChangeSection }) => {
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           avatar: selectedChatFromState.avatar || participantAvatar,
           isAI: true,
-          isUnread: true,
+          isUnread: true, 
         };
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -443,19 +473,6 @@ const ChatSection = ({ onChangeSection }) => {
       <ChatList
         onSelectChat={(chatId) => {
           setSelectedChatId(chatId);
-          setMessages((prev) => {
-            const updated = prev.map(msg =>
-              msg.chatId === chatId ? { ...msg, isUnread: false } : msg
-            );
-            setTimeout(() => {
-              try {
-                localStorage.setItem("messages", JSON.stringify(updated));
-              } catch (e) {
-                console.error("Failed to persist messages to localStorage after marking as read:", e);
-              }
-            }, 0);
-            return updated;
-          });
         }}
         activeChatId={selectedChatId}
         chats={chats.map(chat => ({
