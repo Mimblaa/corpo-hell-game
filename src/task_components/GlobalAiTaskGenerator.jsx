@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-
+import { addNotification } from '../notification_components/NotificationSection';
+import participantAvatar from '../assets/icons/user-avatar.png';
 const AI_TYPES = [
   "Calculator",
   "Notebook",
@@ -134,13 +135,42 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
       timerId = setTimeout(async () => {
         const aiType = AI_TYPES[Math.floor(Math.random() * AI_TYPES.length)];
         await generateAiTask(aiType);
+
+        let chats = JSON.parse(localStorage.getItem("chats"));
+        let messages = JSON.parse(localStorage.getItem("messages")) || [];
+        // Pobierz najnowsze zadanie
+        const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+        const lastTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
+        
+        const chat = chats[Math.floor(Math.random() * chats.length)];
+
+        const messageText = `Czy możesz wykonać zadanie: "${lastTask.title}"?\n${lastTask.description}`;
+
+        const newMessage = {
+            sender: chat.name,
+            message: messageText,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            avatar: participantAvatar,
+            isAI: true,
+            chatId: chat.id,
+            id: Date.now(),
+            isUnread: true
+          };
+
+        messages.push(newMessage);
+        localStorage.setItem("messages", JSON.stringify(messages));
+        try {
+          const notificationMessage = `Nowa wiadomość w czacie "${chat.name}": ${messageText.substring(0, 30)}...`;
+          addNotification(notificationMessage);
+        } catch {}
+
         scheduleNextTask();
       }, randomDelay);
     };
     scheduleNextTask();
     return () => clearTimeout(timerId);
   }, [difficulty]);
-  return null; // Nie renderuje nic
+  return null;
 };
 
 export default GlobalAiTaskGenerator;
