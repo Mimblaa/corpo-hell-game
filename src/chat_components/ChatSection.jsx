@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import ChatList from "./ChatList";
 import ChatContent from "./ChatContent";
 import { addNotification } from "../notification_components/NotificationSection";
-
+import { generateAiTask } from "../task_components/GlobalAiTaskGenerator";
 import participantAvatar from '../assets/icons/user-avatar.png';
 import yourAvatar from '../assets/icons/profile-icon.png';
 
@@ -408,6 +408,7 @@ const ChatSection = ({ onChangeSection }) => {
 
     if(!newMessageData.isAI && isPositive) {
       console.log("[USER INPUT] TASK ADDED");
+      await generateAiTask()
     }
 
     setMessages((prevMessages) => {

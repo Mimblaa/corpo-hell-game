@@ -10,7 +10,7 @@ const AI_TYPES = [
 ];
 
 // Funkcja generująca taska AI (kopiowana z MainContent, ale bez setTasks)
-async function generateAiTask(aiType = "Notebook") {
+export async function generateAiTask(aiType = "Notebook") {
   let prompt = "";
   switch (aiType) {
     case "Calculator":
