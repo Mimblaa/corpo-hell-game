@@ -3,7 +3,7 @@ import yourAvatar from '../assets/icons/profile-icon.png';
 import styles from "./MessageBubble.module.css";
 import UserAvatar from "../UserAvatar";
 
-const MessageBubble = ({ message, sender, time, avatar, isOwn }) => {
+const MessageBubble = ({ message, sender, time, avatar, isOwn, penalty }) => {
   return (
     <div
       className={`${styles.messageContainer} ${isOwn ? styles.ownMessage : ""}`}
@@ -17,11 +17,13 @@ const MessageBubble = ({ message, sender, time, avatar, isOwn }) => {
           <img src={avatar} alt={sender} className={styles.avatar} />
         )}
       </div>
-      <div className={styles.contentContainer}>
+      <div className={styles.contentContainer} >
         <div
           className={`${styles.messageBubble} ${isOwn ? styles.ownBubble : ""}`}
         >
+          <span style={{ color: penalty ? 'red' : 'inherit' }}>
           {message}
+          </span>
         </div>
         <div className={styles.messageInfo}>
           <span className={styles.sender}>{sender}</span>

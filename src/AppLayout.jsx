@@ -66,7 +66,7 @@ const AppLayout = () => {
   return (
     <main className={styles.layout}>
       {/* Generator AI tasków i AI wiadomości działa globalnie */}
-      <GlobalAiTaskGenerator difficulty={difficulty} />
+      {/* <GlobalAiTaskGenerator difficulty={difficulty} /> */}
       <GlobalAiChatGenerator difficulty={difficulty} />
       <AppHeader onSearch={handleSearch} />
       <div className={styles.contentWrapper}>

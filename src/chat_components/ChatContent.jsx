@@ -84,13 +84,16 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChan
               // Apply alignment classes to this wrapper
               className={`${styles.messageWrapper} ${isOwnMessage ? styles.ownMessageWrapper : styles.otherMessageWrapper}`}
             >
+              <span style={message.penalty ? { color: 'red' } : {}}>
               <MessageBubble
                 message={message.message}
                 sender={message.sender}
                 time={message.time}
                 avatar={message.avatar}
                 isOwn={isOwnMessage} // isOwn is still needed for internal MessageBubble styling (e.g., avatar order)
+                penalty={message.penalty}
               />
+              </span>
             </div>
           );
         })}

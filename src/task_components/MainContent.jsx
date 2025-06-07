@@ -6,7 +6,6 @@ import TaskList from "./TaskList";
 import TaskFormModal from "./TaskFormModal";
 import { TabType } from "./types";
 
-
 const AI_TYPES = [
   "Calculator",
   "Notebook",
