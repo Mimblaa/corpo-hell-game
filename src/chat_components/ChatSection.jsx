@@ -250,8 +250,10 @@ const ChatSection = ({ onChangeSection }) => {
 
         if (chat) {
           setIsAiTyping(true);
-          const systemPrompt = `Jesteś współpracownikiem w firmie IT. Twoje imię to ${chat.name}. Twoim zadaniem jest prowadzenie naturalnej, krótkiej konwersacji związanej z pracą. Wiadomości powinny być po polsku, profesjonalne, ale mogą być też lekko humorystyczne lub odzwierciedlać typowe interakcje biurowe. Unikaj zbyt częstego używania emoji. Staraj się, aby wiadomości były różnorodne. Odpowiadaj zwięźle, maksymalnie 1-2 zdania.`;
-          
+          const systemPrompt = 
+          `Jesteś współpracownikiem w firmie IT. Twoim jedynym zadaniem jest cykliczne pytanie użytkownika, czy chce zrobić jakieś zadanie bądź pomóc ci z czymś.
+          Jeśli użytkownik się zgodził, podziękuj mu za to. Użyj krótkiego, uprzejmego pytania po polsku. Maksymalnie 2 krótkie zdania.`;
+
           const chatHistoryForProactive = messages
             .filter(m => m.chatId === selectedChatId)
             .slice(-4)
@@ -263,7 +265,7 @@ const ChatSection = ({ onChangeSection }) => {
           const proactiveApiMessages = [
             { role: "system", content: systemPrompt },
             ...chatHistoryForProactive,
-            { role: "user", content: "Napisz do mnie nową, krótką wiadomość związaną z pracą, kontynuując lub rozpoczynając rozmowę." }
+            { role: "user", content: "Zapytaj się mnie czy zrobię jakieś nowe zadanie" }
           ];
           
           const aiText = await fetchOpenAIResponse(proactiveApiMessages);
@@ -400,6 +402,14 @@ const ChatSection = ({ onChangeSection }) => {
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       isUnread: false,
     };
+
+    const positiveAnswers = ["tak", "dodaj", "zgadzam się", "oczywiście", "jasne", "proszę dodać"];
+    const isPositive = positiveAnswers.some(word => newMessageData.message.toLowerCase().includes(word));
+
+    if(!newMessageData.isAI && isPositive) {
+      console.log("[USER INPUT] TASK ADDED");
+    }
+
     setMessages((prevMessages) => {
       const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
       return [ ...currentMessages, userMessageToSend ];
@@ -414,7 +424,8 @@ const ChatSection = ({ onChangeSection }) => {
       }
       setIsAiTyping(true);
 
-      const systemPromptForReply = `Jesteś współpracownikiem w firmie IT. Twoje imię to ${selectedChatFromState.name}. Odpowiedz na ostatnią wiadomość użytkownika w kontekście prowadzonej rozmowy. Bądź zwięzły (1-2 zdania), profesjonalny, ale możesz być też lekko humorystyczny. Wiadomość po polsku. Zachowuj się jakbyś miał 20 lat`;
+      const systemPromptForReply = `Jesteś współpracownikiem w firmie IT. Twoim jedynym zadaniem jest cykliczne pytanie użytkownika, czy chce zrobić jakieś zadanie bądź pomóc ci z czymś.
+          Jeśli użytkownik się zgodził, podziękuj mu za to. Użyj krótkiego, uprzejmego pytania po polsku. Maksymalnie 2 krótkie zdania.`;
 
       const chatHistoryForReply = [...messages.filter(m => m.chatId === selectedChatId), userMessageToSend]
         .slice(-5)
