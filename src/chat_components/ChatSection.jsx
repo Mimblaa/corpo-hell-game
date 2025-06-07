@@ -392,24 +392,36 @@ const ChatSection = ({ onChangeSection }) => {
     }
   };
 
+  const penaltyPool = [
+    { attribute: "reputation", value: -5, desc: "Utrata reputacji" },
+    { attribute: "bossTrust", value: -3, desc: "Spadek zaufania szefa" },
+    { attribute: "teamTrust", value: -3, desc: "Spadek zaufania zespołu" },
+    { attribute: "politicalSkill", value: -2, desc: "Mniej politycznego sprytu" },
+    { attribute: "responsibilityAvoidance", value: -2, desc: "Mniej unikania odpowiedzialności" },
+    { attribute: "buzzwordPower", value: -2, desc: "Mniej cwaniactwa" },
+    { attribute: "stress", value: +5, desc: "Więcej stresu" },
+    { attribute: "patience", value: -3, desc: "Mniej cierpliwości" },
+    { attribute: "productivityTheatre", value: +4, desc: "Więcej pracy pozorowanej" },
+  ];
+
   const handleSendMessage = async (chatId, newMessageData) => {
-  const userMessageToSend = {
-    ...newMessageData,
-    id: Date.now(),
-    chatId,
-    sender: "You", 
-    avatar: yourAvatar,
-    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    isUnread: false,
-  };
+    const userMessageToSend = {
+      ...newMessageData,
+      id: Date.now(),
+      chatId,
+      sender: "You", 
+      avatar: yourAvatar,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      isUnread: false,
+    };
 
-  setMessages((prevMessages) => {
-    const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
-    return [ ...currentMessages, userMessageToSend ];
-  });
+    setMessages((prevMessages) => {
+      const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
+      return [ ...currentMessages, userMessageToSend ];
+    });
 
-  if (!newMessageData.isAI && selectedChatId && chats.find(c => c.id === selectedChatId)) {
-    const selectedChatFromState = chats.find(c => c.id === selectedChatId);
+    if (!newMessageData.isAI && selectedChatId && chats.find(c => c.id === selectedChatId)) {
+      const selectedChatFromState = chats.find(c => c.id === selectedChatId);
 
     if (!selectedChatFromState) {
         setIsAiTyping(false);
@@ -417,9 +429,8 @@ const ChatSection = ({ onChangeSection }) => {
     }
     setIsAiTyping(true);
 
-    // Nowy prompt systemowy
     const systemPromptForReply = `
-Jesteś asystentem w firmie IT. Twoim zadaniem jest pytać użytkownika, czy chce wykonać zadanie. 
+Jesteś asystentem w firmie IT. Prowadzisz konwersację z kolegą z pracy. 
 Na podstawie 5 ostatnich wiadomości w czacie, oceń, czy użytkownik odpowiadał na chęć wykonania zadania.
 Jeśli z kontektsu nie wynika, że odpowiadał na chęć wykonania zadania, tylko na przykład prosił o pomoc, to prowadź z nim normalną konwersację i nie zwracaj odpowiedzi w formacie JSON.
 Jeśli użytkownik odpowie na pytanie o wykonanie zadania, oceń czy zgodził się na wykonanie zadania ("accept") czy odmówił ("reject") i odpowiadaj zawsze w formacie JSON:
@@ -481,20 +492,14 @@ a także w tym wypadku nie dodawaj żadnych innych znaków poza JSON. Jeśli uż
           }
         ]);
       } else if (parsed.decision === "reject") {
-        // Pobierz karę z ostatniego zadania
-        const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-        const lastTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
-        let penaltyMsg = parsed.reply;
-        if (lastTask && lastTask.penalty) {
-          const stats = JSON.parse(localStorage.getItem("playerStats") || "{}");
-          const penaltyAttr = lastTask.penalty.attribute;
-          const penaltyValue = lastTask.penalty.value;
-          if (penaltyAttr && typeof penaltyValue === "number") {
-            stats[penaltyAttr] = (stats[penaltyAttr] || 0) + penaltyValue;
-            localStorage.setItem("playerStats", JSON.stringify(stats));
-            penaltyMsg += ` Kara: ${penaltyValue} do "${penaltyAttr}".`;
-          }
-        }
+        // Losuj karę z puli
+        const penalty = penaltyPool[Math.floor(Math.random() * penaltyPool.length)];
+        // Zastosuj karę do statystyk gracza
+        const stats = JSON.parse(localStorage.getItem("playerStats") || "{}");
+        stats[penalty.attribute] = (stats[penalty.attribute] || 0) + penalty.value;
+        localStorage.setItem("playerStats", JSON.stringify(stats));
+        // Wiadomość o karze
+        let penaltyMsg = parsed.reply + ` Kara: ${penalty.value} (${penalty.desc}).`;
         setMessages((prevMessages) => [
           ...prevMessages,
           {
