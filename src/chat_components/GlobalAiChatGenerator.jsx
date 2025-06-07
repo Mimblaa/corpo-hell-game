@@ -77,13 +77,17 @@ const GlobalAiChatGenerator = ({ difficulty = "medium" }) => {
           role: msg.isAI || msg.sender !== "You" ? "assistant" : "user",
           content: msg.message
         }));
-        const systemPrompt = `
-          Jesteś współpracownikiem w firmie IT. Twoim jedynym zadaniem jest cykliczne pytanie użytkownika, czy chce zrobić jakieś zadanie bądź pomóc ci z czymś.
-          Jeśli użytkownik się zgodził, podziękuj mu za to. Użyj krótkiego, uprzejmego pytania po polsku. Maksymalnie 2 krótkie zdania.`;
+        const systemPrompt = `Jesteś współpracownikiem w firmie IT. Twoje imię to ${chat.name}. 
+Twoim zadaniem jest prowadzenie naturalnej, krótkiej konwersacji związanej z pracą.
+Wiadomości powinny być po polsku, profesjonalne, ale mogą być też lekko humorystyczne lub odzwierciedlać typowe interakcje biurowe.
+Raz na jakiś czas powinieneś poprosić o wykonanie jakiegoś zadania, na przykład: "Czy mógłbyś sprawdzić ten raport?" lub "Potrzebuję Twojej opinii na temat tego projektu."
+Pytanie powinno oczekiwać na odpowiedź twierdząca lub negatywna. Jeśli widzisz, że w ostatnich wiadmościach było już pytanie o wykonanie zadania, nie pytaj ponownie.
+Unikaj zbyt częstego używania emoji. Staraj się, aby wiadomości były różnorodne. Odpowiadaj zwięźle, maksymalnie 1-2 zdania.`;
+        
         const apiMessages = [
           { role: "system", content: systemPrompt },
           ...chatHistory,
-          { role: "user", content: "Zapytaj się mnie czy zrobię jakieś nowe zadanie" }
+          { role: "user", content: "Napisz do mnie nową, krótką wiadomość związaną z pracą, kontynuując lub rozpoczynając rozmowę." }
         ];
         const aiText = await fetchOpenAIResponse(apiMessages);
         if (aiText) {
