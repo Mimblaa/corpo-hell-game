@@ -393,81 +393,141 @@ const ChatSection = ({ onChangeSection }) => {
   };
 
   const handleSendMessage = async (chatId, newMessageData) => {
-    const userMessageToSend = {
-      ...newMessageData,
-      id: Date.now(),
-      chatId,
-      sender: "You", 
-      avatar: yourAvatar,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      isUnread: false,
-    };
+  const userMessageToSend = {
+    ...newMessageData,
+    id: Date.now(),
+    chatId,
+    sender: "You", 
+    avatar: yourAvatar,
+    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    isUnread: false,
+  };
 
-    const positiveAnswers = ["tak", "dodaj", "zgadzam się", "oczywiście", "jasne", "proszę dodać"];
-    const isPositive = positiveAnswers.some(word => newMessageData.message.toLowerCase().includes(word));
+  setMessages((prevMessages) => {
+    const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
+    return [ ...currentMessages, userMessageToSend ];
+  });
 
-    if(!newMessageData.isAI && isPositive) {
-      console.log("[USER INPUT] TASK ADDED");
-      await generateAiTask()
+  if (!newMessageData.isAI && selectedChatId && chats.find(c => c.id === selectedChatId)) {
+    const selectedChatFromState = chats.find(c => c.id === selectedChatId);
+
+    if (!selectedChatFromState) {
+        setIsAiTyping(false);
+        return;
     }
+    setIsAiTyping(true);
 
-    setMessages((prevMessages) => {
-      const currentMessages = Array.isArray(prevMessages) ? prevMessages : [];
-      return [ ...currentMessages, userMessageToSend ];
-    });
+    // Nowy prompt systemowy
+    const systemPromptForReply = `
+Jesteś asystentem w firmie IT. Twoim zadaniem jest pytać użytkownika, czy chce wykonać zadanie. 
+Na podstawie 5 ostatnich wiadomości w czacie, oceń, czy użytkownik odpowiadał na chęć wykonania zadania.
+Jeśli z kontektsu nie wynika, że odpowiadał na chęć wykonania zadania, tylko na przykład prosił o pomoc, to prowadź z nim normalną konwersację i nie zwracaj odpowiedzi w formacie JSON.
+Jeśli użytkownik odpowie na pytanie o wykonanie zadania, oceń czy zgodził się na wykonanie zadania ("accept") czy odmówił ("reject") i odpowiadaj zawsze w formacie JSON:
+{"decision": "accept" lub "reject", "reply": "krótka odpowiedź do użytkownika po polsku"}
+a także w tym wypadku nie dodawaj żadnych innych znaków poza JSON. Jeśli użytkownik się zgodził, to w reply podziękuj mu za to i napisz, że zadanie zostanie dopisane to jego listy zadań.
+`;
 
-    if (!newMessageData.isAI && selectedChatId && chats.find(c => c.id === selectedChatId)) {
-      const selectedChatFromState = chats.find(c => c.id === selectedChatId);
+    const chatHistoryForReply = [...messages.filter(m => m.chatId === selectedChatId), userMessageToSend]
+      .slice(-5)
+      .map(msg => ({
+        role: msg.isAI || msg.sender !== "You" ? "assistant" : "user",
+        content: msg.message
+      }));
 
-      if (!selectedChatFromState) {
-          setIsAiTyping(false);
-          return;
-      }
-      setIsAiTyping(true);
+    const reactiveApiMessages = [
+      { role: "system", content: systemPromptForReply },
+      ...chatHistoryForReply 
+    ];
 
-      const systemPromptForReply = `Jesteś współpracownikiem w firmie IT. Twoim jedynym zadaniem jest cykliczne pytanie użytkownika, czy chce zrobić jakieś zadanie bądź pomóc ci z czymś.
-          Jeśli użytkownik się zgodził, podziękuj mu za to. Użyj krótkiego, uprzejmego pytania po polsku. Maksymalnie 2 krótkie zdania.`;
+    const aiReplyText = await fetchOpenAIResponse(reactiveApiMessages);
+    setIsAiTyping(false);
 
-      const chatHistoryForReply = [...messages.filter(m => m.chatId === selectedChatId), userMessageToSend]
-        .slice(-5)
-        .map(msg => ({
-          role: msg.isAI || msg.sender !== "You" ? "assistant" : "user",
-          content: msg.message
-        }));
-      
-      const reactiveApiMessages = [
-        { role: "system", content: systemPromptForReply },
-        ...chatHistoryForReply 
-      ];
-
-      const aiReplyText = await fetchOpenAIResponse(reactiveApiMessages);
-      setIsAiTyping(false);
-
-      if (aiReplyText) {
-        const aiReplyMessage = {
-          id: Date.now() + 1,
-          chatId: selectedChatId,
-          sender: selectedChatFromState.name,
-          message: aiReplyText,
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          avatar: selectedChatFromState.avatar || participantAvatar,
-          isAI: true,
-          isUnread: true, 
-        };
+    if (aiReplyText) {
+      let parsed;
+      try {
+        parsed = JSON.parse(aiReplyText);
+      } catch (e) {
+        // jeśli nie ma odpowiedzi na pytanie, wyświetl surową odpowiedź
         setMessages((prevMessages) => [
           ...prevMessages,
-          aiReplyMessage,
+          {
+            id: Date.now() + 1,
+            chatId: selectedChatId,
+            sender: selectedChatFromState.name,
+            message: aiReplyText,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            avatar: selectedChatFromState.avatar || participantAvatar,
+            isAI: true,
+            isUnread: true, 
+          }
         ]);
-        
-        try {
-            const notificationMessage = `Nowa odpowiedź w czacie "${selectedChatFromState.name}": ${aiReplyText.substring(0, 30)}...`;
-            addNotification(notificationMessage);
-        } catch(e) {
-            console.error("[AI Reply] Error sending notification for AI reply:", e);
+        return;
+      }
+
+      // Decyzja AI: accept/reject
+      if (parsed.decision === "accept") {
+        await generateAiTask();
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: Date.now() + 1,
+            chatId: selectedChatId,
+            sender: selectedChatFromState.name,
+            message: parsed.reply,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            avatar: selectedChatFromState.avatar || participantAvatar,
+            isAI: true,
+            isUnread: true, 
+          }
+        ]);
+      } else if (parsed.decision === "reject") {
+        // Pobierz karę z ostatniego zadania
+        const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+        const lastTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
+        let penaltyMsg = parsed.reply;
+        if (lastTask && lastTask.penalty) {
+          const stats = JSON.parse(localStorage.getItem("playerStats") || "{}");
+          const penaltyAttr = lastTask.penalty.attribute;
+          const penaltyValue = lastTask.penalty.value;
+          if (penaltyAttr && typeof penaltyValue === "number") {
+            stats[penaltyAttr] = (stats[penaltyAttr] || 0) + penaltyValue;
+            localStorage.setItem("playerStats", JSON.stringify(stats));
+            penaltyMsg += ` Kara: ${penaltyValue} do "${penaltyAttr}".`;
+          }
         }
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: Date.now() + 2,
+            chatId: selectedChatId,
+            sender: selectedChatFromState.name,
+            message: penaltyMsg,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            avatar: selectedChatFromState.avatar || participantAvatar,
+            isAI: true,
+            isUnread: true,
+            penalty: true,
+          }
+        ]);
+      } else {
+        // jeśli nie ma odpowiedzi na pytanie, wyświetl surową odpowiedź
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: Date.now() + 1,
+            chatId: selectedChatId,
+            sender: selectedChatFromState.name,
+            message: aiReplyText,
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            avatar: selectedChatFromState.avatar || participantAvatar,
+            isAI: true,
+            isUnread: true, 
+          }
+        ]);
       }
     }
-  };
+  }
+};
   
   const selectedChat = Array.isArray(chats) ? chats.find((chat) => chat.id === selectedChatId) : null;
 
