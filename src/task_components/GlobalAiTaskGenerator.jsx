@@ -191,10 +191,6 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
 
         messages.push(newMessage);
         localStorage.setItem("messages", JSON.stringify(messages));
-        // try {
-        //   const notificationMessage = `Nowa wiadomość w czacie "${chat.name}": ${messageText.substring(0, 30)}...`;
-        //   addNotification(notificationMessage);
-        // } catch {}
 
         scheduleNextTask();
         console.log(`[TASK GENERATION] New task generation scheduled in ${Math.round(randomDelay / 1000)} seconds.`);
