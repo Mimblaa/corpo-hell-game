@@ -48,7 +48,7 @@ Pytanie nie powinno zawierać szczegółów odnośnie zadania, ale ogólnie o co
 }
 
 // Funkcja generująca taska AI (kopiowana z MainContent, ale bez setTasks)
-async function generateAiTask(aiType = "Notebook") {
+async function generateAiTask(aiType = "Notebook", chatId) {
   let prompt = "";
   switch (aiType) {
     case "Calculator":
@@ -118,6 +118,8 @@ async function generateAiTask(aiType = "Notebook") {
       title: taskData.title,
       description: taskData.description,
       dueDate,
+      chatId: chatId,
+      isAccepted: false,
       priority: "medium",
       tags: [aiType.toLowerCase()],
       status: "Nie przesłano",
@@ -136,11 +138,8 @@ async function generateAiTask(aiType = "Notebook") {
       correctAnswer: taskData.correctAnswer || "",
       isNew: true,
     };
-    // Dodaj do localStorage (globalnie)
-    const savedTasks = localStorage.getItem("tasks");
-    const tasks = savedTasks ? JSON.parse(savedTasks) : [];
-    tasks.push(newTask);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    return newTask;
   } catch (e) {
     // eslint-disable-next-line no-alert
     alert("Nie udało się wygenerować zadania AI: " + e.message);
@@ -157,8 +156,8 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
         max = 7 * 60 * 1000;
         break;
       case "hard":
-        min = 30 * 1000;
-        max = 90 * 1000;
+        min = 10 * 1000;
+        max = 15 * 1000;
         break;
       case "medium":
       default:
@@ -166,41 +165,39 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
         max = 4 * 60 * 1000;
         break;
     }
-    const scheduleNextTask = () => {
+    const scheduleNextTask = async () => {
       const randomDelay = min + Math.random() * (max - min);
       timerId = setTimeout(async () => {
-        const aiType = AI_TYPES[Math.floor(Math.random() * AI_TYPES.length)];
-        await generateAiTask(aiType);
-
         let chats = JSON.parse(localStorage.getItem("chats"));
-        let messages = JSON.parse(localStorage.getItem("messages")) || [];
-        // Pobierz najnowsze zadanie
-        const tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
-        const lastTask = tasks.length > 0 ? tasks[tasks.length - 1] : null;
-        
         const chat = chats[Math.floor(Math.random() * chats.length)];
-
-        const messageText = await generateAiMessage(lastTask);
-
+        
+        const aiType = AI_TYPES[Math.floor(Math.random() * AI_TYPES.length)];
+        const task = await generateAiTask(aiType, chat.id);
+        
+        const messageText = await generateAiMessage(task);
+        
+        let messages = JSON.parse(localStorage.getItem("messages")) || [];
         const newMessage = {
-            sender: chat.name,
-            message: messageText,
-            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            avatar: participantAvatar,
-            isAI: true,
-            chatId: chat.id,
-            id: Date.now(),
-            isUnread: true
-          };
+          sender: chat.name,
+          message: messageText,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          avatar: participantAvatar,
+          isAI: true,
+          chatId: chat.id,
+          id: Date.now(),
+          isUnread: true,
+          task: task
+        };
 
         messages.push(newMessage);
         localStorage.setItem("messages", JSON.stringify(messages));
-        try {
-          const notificationMessage = `Nowa wiadomość w czacie "${chat.name}": ${messageText.substring(0, 30)}...`;
-          addNotification(notificationMessage);
-        } catch {}
+        // try {
+        //   const notificationMessage = `Nowa wiadomość w czacie "${chat.name}": ${messageText.substring(0, 30)}...`;
+        //   addNotification(notificationMessage);
+        // } catch {}
 
         scheduleNextTask();
+        console.log(`[TASK GENERATION] New task generation scheduled in ${Math.round(randomDelay / 1000)} seconds.`);
       }, randomDelay);
     };
     scheduleNextTask();
