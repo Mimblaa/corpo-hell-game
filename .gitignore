@@ -137,7 +137,7 @@ dist
 
 # Python virtual environment
 venv/
-
+.venv/
 # Py cache
 __pycache__/
 
