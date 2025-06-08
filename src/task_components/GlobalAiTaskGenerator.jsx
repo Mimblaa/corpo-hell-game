@@ -10,6 +10,43 @@ const AI_TYPES = [
   "Programming"
 ];
 
+const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+
+// Funkcja generująca wiadomość AI na podstawie taska 
+async function generateAiMessage(task) {
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: `Jesteś pracownikiem biura.
+Nie uwzględniaj imienia osoby, do której się zwracasz.
+Na podstawie tasku przygotuj wiadomość do kolegi z pracy z prośbą o wykonanie tego zadania.
+Pytanie nie powinno zawierać szczegółów odnośnie zadania, ale ogólnie o co chodzi w zadaniu.` },
+          { role: "user", content: `Zadanie: ${task.title}\nOpis: ${task.description}` }
+        ],
+        max_tokens: 200,
+        temperature: 0.7,
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error("Błąd AI: " + response.status);
+    const content = data.choices?.[0]?.message?.content || "";
+    if (!content) throw new Error("AI nie zwróciło treści wiadomości");
+    return content;
+  } catch (e) {
+    alert("Nie udało się wygenerować wiadomości AI: " + e.message);
+    return "Przepraszam, nie mogę wygenerować wiadomości w tej chwili.";
+  }
+}
+
 // Funkcja generująca taska AI (kopiowana z MainContent, ale bez setTasks)
 async function generateAiTask(aiType = "Notebook") {
   let prompt = "";
@@ -36,7 +73,6 @@ async function generateAiTask(aiType = "Notebook") {
       prompt = 'Wymyśl zadanie do wykonania w pracy biurowej. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania","answers":[],"correctAnswer":"","effect":{"attribute":"Reputacja","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł i question mają być konkretne, nie ogólne.';
   }
   try {
-    const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -144,7 +180,7 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
         
         const chat = chats[Math.floor(Math.random() * chats.length)];
 
-        const messageText = `Czy możesz wykonać zadanie: "${lastTask.title}"?\n${lastTask.description}`;
+        const messageText = await generateAiMessage(lastTask);
 
         const newMessage = {
             sender: chat.name,
