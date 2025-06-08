@@ -156,8 +156,8 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
         max = 7 * 60 * 1000;
         break;
       case "hard":
-        min = 10 * 1000;
-        max = 15 * 1000;
+        min = 60 * 1000;
+        max = 120 * 1000;
         break;
       case "medium":
       default:
