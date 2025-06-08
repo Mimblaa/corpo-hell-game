@@ -48,14 +48,10 @@ const MessageBubble = ({ message, sender, time, avatar, isOwn, task, penalty }) 
   }
 
   const onTaskRejected = async (task) => {
-    // send message to user that penalty is applied
     const penalty = task.penalty;
-    console.log(penalty)
-    console.log("asdfaiwerjhfgaiujsdhnfiuaesrhf");
-
     updatePlayerStats(null, penalty);
 
-    const penaltyMessageText = `Zadanie "${task.title}" zostało odrzucone. Została nałożona kara ${penalty.value}.`;
+    const penaltyMessageText = `Zadanie "${task.title}" zostało odrzucone. Została nałożona kara ${penalty.value} do ${penalty.attribute}.`;
     const penaltyMessage = {
       id: Date.now(),
       chatId: task.chatId,
