@@ -99,6 +99,25 @@ const ChatSection = ({ onChangeSection }) => {
     return savedId ? parseInt(savedId, 10) : 1;
   });
 
+  // Synchronizuj messages z localStorage
+  useEffect(() => {
+    const syncMessages = () => {
+      const savedMessages = localStorage.getItem("messages");
+      if (savedMessages) {
+        try {
+          const parsed = JSON.parse(savedMessages);
+          if (Array.isArray(parsed)) setMessages(parsed);
+        } catch (e) {}
+      }
+    };
+    window.addEventListener("storage", syncMessages);
+    const interval = setInterval(syncMessages, 2000);
+    return () => {
+      window.removeEventListener("storage", syncMessages);
+      clearInterval(interval);
+    };
+  }, []);
+
   const [chats, setChats] = useState(() => {
     const savedChats = localStorage.getItem("chats");
     try {

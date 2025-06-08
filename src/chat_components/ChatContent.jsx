@@ -90,6 +90,7 @@ const ChatContent = ({ selectedChatId, chatName, messages, onSendMessage, onChan
                 time={message.time}
                 avatar={message.avatar}
                 isOwn={isOwnMessage} // isOwn is still needed for internal MessageBubble styling (e.g., avatar order)
+                task={message.task}
               />
             </div>
           );

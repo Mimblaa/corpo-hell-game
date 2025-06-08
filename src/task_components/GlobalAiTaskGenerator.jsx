@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-
+import { addNotification } from '../notification_components/NotificationSection';
+import participantAvatar from '../assets/icons/user-avatar.png';
 const AI_TYPES = [
   "Calculator",
   "Notebook",
@@ -9,8 +10,45 @@ const AI_TYPES = [
   "Programming"
 ];
 
+const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+
+// Funkcja generująca wiadomość AI na podstawie taska 
+async function generateAiMessage(task) {
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: `Jesteś pracownikiem biura.
+Nie uwzględniaj imienia osoby, do której się zwracasz.
+Na podstawie tasku przygotuj wiadomość do kolegi z pracy z prośbą o wykonanie tego zadania.
+Pytanie nie powinno zawierać szczegółów odnośnie zadania, ale ogólnie o co chodzi w zadaniu.` },
+          { role: "user", content: `Zadanie: ${task.title}\nOpis: ${task.description}` }
+        ],
+        max_tokens: 200,
+        temperature: 0.7,
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) throw new Error("Błąd AI: " + response.status);
+    const content = data.choices?.[0]?.message?.content || "";
+    if (!content) throw new Error("AI nie zwróciło treści wiadomości");
+    return content;
+  } catch (e) {
+    alert("Nie udało się wygenerować wiadomości AI: " + e.message);
+    return "Przepraszam, nie mogę wygenerować wiadomości w tej chwili.";
+  }
+}
+
 // Funkcja generująca taska AI (kopiowana z MainContent, ale bez setTasks)
-async function generateAiTask(aiType = "Notebook") {
+async function generateAiTask(aiType = "Notebook", chatId) {
   let prompt = "";
   switch (aiType) {
     case "Calculator":
@@ -35,7 +73,6 @@ async function generateAiTask(aiType = "Notebook") {
       prompt = 'Wymyśl zadanie do wykonania w pracy biurowej. Zwróć JSON: {"title":"[unikalny, konkretny tytuł zadania]","description":"Opis zadania","question":"Polecenie do wykonania","answers":[],"correctAnswer":"","effect":{"attribute":"Reputacja","value":1},"penalty":{"attribute":"Stres","value":-1}}. Tytuł i question mają być konkretne, nie ogólne.';
   }
   try {
-    const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -81,6 +118,8 @@ async function generateAiTask(aiType = "Notebook") {
       title: taskData.title,
       description: taskData.description,
       dueDate,
+      chatId: chatId,
+      isAccepted: false,
       priority: "medium",
       tags: [aiType.toLowerCase()],
       status: "Nie przesłano",
@@ -99,11 +138,8 @@ async function generateAiTask(aiType = "Notebook") {
       correctAnswer: taskData.correctAnswer || "",
       isNew: true,
     };
-    // Dodaj do localStorage (globalnie)
-    const savedTasks = localStorage.getItem("tasks");
-    const tasks = savedTasks ? JSON.parse(savedTasks) : [];
-    tasks.push(newTask);
-    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    return newTask;
   } catch (e) {
     // eslint-disable-next-line no-alert
     alert("Nie udało się wygenerować zadania AI: " + e.message);
@@ -120,8 +156,8 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
         max = 7 * 60 * 1000;
         break;
       case "hard":
-        min = 30 * 1000;
-        max = 90 * 1000;
+        min = 60 * 1000;
+        max = 120 * 1000;
         break;
       case "medium":
       default:
@@ -129,18 +165,41 @@ const GlobalAiTaskGenerator = ({ difficulty = "medium" }) => {
         max = 4 * 60 * 1000;
         break;
     }
-    const scheduleNextTask = () => {
+    const scheduleNextTask = async () => {
       const randomDelay = min + Math.random() * (max - min);
       timerId = setTimeout(async () => {
+        let chats = JSON.parse(localStorage.getItem("chats"));
+        const chat = chats[Math.floor(Math.random() * chats.length)];
+        
         const aiType = AI_TYPES[Math.floor(Math.random() * AI_TYPES.length)];
-        await generateAiTask(aiType);
+        const task = await generateAiTask(aiType, chat.id);
+        
+        const messageText = await generateAiMessage(task);
+        
+        let messages = JSON.parse(localStorage.getItem("messages")) || [];
+        const newMessage = {
+          sender: chat.name,
+          message: messageText,
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          avatar: participantAvatar,
+          isAI: true,
+          chatId: chat.id,
+          id: Date.now(),
+          isUnread: true,
+          task: task
+        };
+
+        messages.push(newMessage);
+        localStorage.setItem("messages", JSON.stringify(messages));
+
         scheduleNextTask();
+        console.log(`[TASK GENERATION] New task generation scheduled in ${Math.round(randomDelay / 1000)} seconds.`);
       }, randomDelay);
     };
     scheduleNextTask();
     return () => clearTimeout(timerId);
   }, [difficulty]);
-  return null; // Nie renderuje nic
+  return null;
 };
 
 export default GlobalAiTaskGenerator;
