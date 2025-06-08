@@ -22,8 +22,8 @@ const updatePlayerStats = (effect, penalty) => {
     if (statObject && statObject.attribute && statObject.value) {
       const mappedStat = statMapping[statObject.attribute];
       if (mappedStat) {
-        const currentValue = parseInt(stats[mappedStat] || 0, 10); // Ensure numeric value
-        const changeValue = isEffect ? parseInt(statObject.value, 10) : parseInt(statObject.value, 10); // Parse value as integer
+        const currentValue = parseInt(stats[mappedStat], 10);
+        const changeValue = isEffect ? parseInt(statObject.value, 10) : parseInt(statObject.value, 10);
         stats[mappedStat] = currentValue + changeValue;
       }
     }
@@ -37,42 +37,43 @@ const updatePlayerStats = (effect, penalty) => {
 
 
 const MessageBubble = ({ message, sender, time, avatar, isOwn, task, penalty }) => {
+  const [taskHandled, setTaskHandled] = useState(() => {
+    if (task && task.id) {
+      const acceptedTasks = JSON.parse(localStorage.getItem("acceptedTasks") || "[]");
+      return acceptedTasks.includes(task.id);
+    }
+    return false;
+  });
+  const [penaltyMessageState, setPenaltyMessageState] = useState(null);
+
+  const markTaskAccepted = (taskId) => {
+    const acceptedTasks = JSON.parse(localStorage.getItem("acceptedTasks") || "[]");
+    if (!acceptedTasks.includes(taskId)) {
+      acceptedTasks.push(taskId);
+      localStorage.setItem("acceptedTasks", JSON.stringify(acceptedTasks));
+    }
+  };
 
   const onTaskAccept = async (task) => {
-    // save task to localStorage
     const savedTasks = localStorage.getItem("tasks");
     const tasks = savedTasks ? JSON.parse(savedTasks) : [];
     tasks.push(task);
     localStorage.setItem("tasks", JSON.stringify(tasks));
-    task.isAccepted = true;
-  }
+    markTaskAccepted(task.id);
+    setTaskHandled(true);
+  };
 
   const onTaskRejected = async (task) => {
     const penalty = task.penalty;
     updatePlayerStats(null, penalty);
-
+    markTaskAccepted(task.id);
+    setTaskHandled(true);
     const penaltyMessageText = `Zadanie "${task.title}" zostało odrzucone. Została nałożona kara ${penalty.value} do ${penalty.attribute}.`;
-    const penaltyMessage = {
-      id: Date.now(),
-      chatId: task.chatId,
-      sender: sender,
-      message: penaltyMessageText,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      avatar: yourAvatar,
-      isAI: true,
-      penalty: true,
-      isUnread: true
-    };
+    setPenaltyMessageState({ message: penaltyMessageText });
+  };
 
-    console.log(penaltyMessage);
-
-    // save penalty message to localStorage
-    const savedMessages = localStorage.getItem("messages");
-    const messages = savedMessages ? JSON.parse(savedMessages) : [];
-    messages.push(penaltyMessage);
-    localStorage.setItem("messages", JSON.stringify(messages));
-    task.isAccepted = true;
-  }
+  // If task is accepted/rejected, do not show buttons after reload/section change
+  const isTaskAccepted = task && task.id && JSON.parse(localStorage.getItem("acceptedTasks") || "[]").includes(task.id);
 
   return (
     <div
@@ -93,7 +94,7 @@ const MessageBubble = ({ message, sender, time, avatar, isOwn, task, penalty }) 
         >
             {message}
         </div>
-        {task && !task.isAccepted && (
+        {task && !isTaskAccepted && !taskHandled && (
           <div>
             <span className={styles.taskText}>{task.text}</span>
             <button
@@ -106,6 +107,11 @@ const MessageBubble = ({ message, sender, time, avatar, isOwn, task, penalty }) 
             >
               ❌
             </button>
+          </div>
+        )}
+        {penaltyMessageState && (
+          <div className={styles.messageBubble} style={{marginTop: 8, background: '#ffdddd', border: '1px solid #d32f2f', color: '#b71c1c'}}>
+            {penaltyMessageState.message}
           </div>
         )}
         <div className={styles.messageInfo}>
