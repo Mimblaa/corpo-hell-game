@@ -14,15 +14,9 @@ const CallsSection = ({ defaultContacts }) => {
   });
 
   const [contacts, setContacts] = useState(() => {
-    const savedContacts = localStorage.getItem("contacts");
     const savedChats = localStorage.getItem("chats");
-    const chatContacts = savedChats ? JSON.parse(savedChats).map(chat => ({ id: `chat-${chat.id}`, name: chat.name })) : [];
-    return savedContacts ? [...JSON.parse(savedContacts), ...chatContacts] : [...defaultContacts, ...chatContacts];
+    return savedChats ? JSON.parse(savedChats).map(chat => ({ id: chat.id, name: chat.name })) : [];
   });
-
-  useEffect(() => {
-    localStorage.setItem("contacts", JSON.stringify(contacts.filter(contact => !contact.id.toString().startsWith("chat-"))));
-  }, [contacts]);
 
   const [activeCall, setActiveCall] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
