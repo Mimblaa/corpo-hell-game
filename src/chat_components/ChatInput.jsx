@@ -12,7 +12,7 @@ const ChatInput = ({ onSendMessage }) => {
   const handleSubmit = (e, isAI = false) => {
     e.preventDefault();
     if (message.trim()) {
-      onSendMessage(message, isAI);  // Pass isAI flag when sending the message
+      onSendMessage(message, isAI);
       setMessage("");
     }
   };
@@ -52,20 +52,6 @@ const ChatInput = ({ onSendMessage }) => {
           <img
             src={sendIcon}
             alt="Send"
-            className={styles.sendIcon}
-          />
-        </button>
-        
-        {/* AI send button */}
-        <button
-          type="submit"
-          className={styles.sendButton}
-          disabled={!message.trim()}
-          onClick={(e) => handleSubmit(e, true)}  // Send AI message
-        >
-          <img
-            src={aiSendIcon}  // Custom icon for AI
-            alt="Send AI"
             className={styles.sendIcon}
           />
         </button>
