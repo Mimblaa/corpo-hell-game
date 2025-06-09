@@ -3,7 +3,46 @@ import React, { useState, useEffect } from "react";
 import styles from "./CallsSection.module.css";
 import deleteIcon from "../assets/icons/delete.png"; // Import the delete icon
 
+// --- AI Conversation Helpers ---
+const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
+async function fetchOpenAIResponse(apiMessages) {
+  if (!OPENAI_API_KEY) {
+    return "To jest przykładowa odpowiedź AI, ponieważ klucz API OpenAI nie został skonfigurowany poprawnie w pliku .env.";
+  }
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: apiMessages,
+        max_tokens: 300,
+        temperature: 0.7
+      })
+    });
+    if (!response.ok) return "Przepraszam, mam chwilowe problemy z odpowiedzią. Spróbujmy później.";
+    const data = await response.json();
+    return data.choices[0]?.message?.content.trim() || "Nie udało mi się wygenerować odpowiedzi.";
+  } catch {
+    return "Wystąpił błąd podczas komunikacji z AI. Spróbuj ponownie.";
+  }
+}
+
 const CallsSection = ({ defaultContacts }) => {
+
+  // --- AI Conversation State ---
+  const [conversationStep, setConversationStep] = useState(0); // 0 = not started, 1-5 = in progress
+  // [{question, options, answer, effect, penalty}]
+  const [conversationHistory, setConversationHistory] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState("");
+  const [currentOptions, setCurrentOptions] = useState([]);
+  const [currentEffect, setCurrentEffect] = useState("");
+  const [currentPenalty, setCurrentPenalty] = useState("");
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+
   const [callHistory, setCallHistory] = useState(() => {
     const savedHistory = localStorage.getItem("callHistory");
     return savedHistory ? JSON.parse(savedHistory) : [];
@@ -53,42 +92,163 @@ const CallsSection = ({ defaultContacts }) => {
     setCallHistory((prevHistory) => prevHistory.filter((call) => call.id !== id));
   };
 
-  const handleStartCall = (contact) => {
+
+  // --- Stat validation helpers ---
+  const allowedStats = [
+    "Reputacja",
+    "Zaufanie Szefa",
+    "Zaufanie Zespołu",
+    "Polityczny Spryt",
+    "Unikanie Odpowiedzialności",
+    "Cwaniactwo",
+    "Stres",
+    "Cierpliwość",
+    "Produktywność Teatralna"
+  ];
+  function validateEffectOrPenalty(str, isEffect = true) {
+    // isEffect: true = efekt (0-5), false = kara (-5-0)
+    const match = str.match(/^([A-Za-ząćęłńóśźżĄĆĘŁŃÓŚŹŻ ]+)\s*([+-]?\d+)/);
+    if (!match) return isEffect ? "Reputacja +0" : "Stres -0";
+    let [_, stat, value] = match;
+    stat = stat.trim();
+    value = parseInt(value, 10);
+    if (!allowedStats.includes(stat)) stat = isEffect ? "Reputacja" : "Stres";
+    if (isEffect) value = Math.max(0, Math.min(5, value));
+    else value = Math.min(0, Math.max(-5, value));
+    return `${stat} ${value >= 0 ? "+" : ""}${value}`;
+  }
+
+  // Rozpocznij rozmowę i pobierz pierwsze pytanie/odpowiedzi od AI
+  const handleStartCall = async (contact) => {
     setActiveCall({ ...contact, time: new Date().toISOString(), type: "outgoing" });
-    setSelectedScenarioOption(null); // Reset the Video Stream Placeholder
+    setSelectedScenarioOption(null);
+    setConversationStep(1);
+    setConversationHistory([]);
+    setIsLoadingAI(true);
+    setCurrentQuestion("");
+    setCurrentOptions([]);
+    setCurrentEffect("");
+    setCurrentPenalty("");
+
+    // Prompt do AI: generuj pytanie, 5 odpowiedzi, efekty i kary (po jednej dla każdej opcji)
+    const statsList = allowedStats.map(s => `"${s}"`).join(", ");
+    const systemPrompt = `Jesteś pracownikiem biura o imieniu ${contact.name}. Rozmawiasz przez telefon z kolegą z pracy. Wymyśl pytanie do rozmowy telefonicznej w pracy (po polsku), podaj 5 możliwych odpowiedzi do wyboru oraz dla każdej odpowiedzi podaj efekt (nagrodę) i karę.\nEfekt i kara muszą być wybrane z tej listy statystyk: ${statsList}.\nEfekt to zawsze jedna statystyka z tej listy z wartością od 0 do 5 (np. "Reputacja +3"). Kara to zawsze jedna statystyka z tej listy z wartością od -5 do 0 (np. "Stres -2").\nOdpowiedz TYLKO w formacie JSON, bez żadnych opisów: {"question":"...", "options":["...","...","...","...","..."], "effects":["Reputacja +3",...], "penalties":["Cierpliwość -1",...]}`;
+    const apiMessages = [
+      { role: "system", content: systemPrompt }
+    ];
+    const aiResponse = await fetchOpenAIResponse(apiMessages);
+    let parsed;
+    try {
+      parsed = JSON.parse(aiResponse);
+    } catch {
+      // Spróbuj wyciągnąć JSON z tekstu
+      const match = aiResponse.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          parsed = JSON.parse(match[0]);
+        } catch {
+          parsed = null;
+        }
+      }
+    }
+    if (parsed && parsed.question && parsed.options && parsed.effects && parsed.penalties) {
+      setCurrentQuestion(parsed.question);
+      setCurrentOptions(parsed.options);
+      setCurrentEffect(validateEffectOrPenalty(parsed.effects[0] || "", true));
+      setCurrentPenalty(validateEffectOrPenalty(parsed.penalties[0] || "", false));
+    } else {
+      setCurrentQuestion("Błąd AI lub niepoprawny format odpowiedzi.");
+      setCurrentOptions([]);
+      setCurrentEffect("");
+      setCurrentPenalty("");
+    }
+    setIsLoadingAI(false);
+  };
+
+  // Obsługa wyboru odpowiedzi przez użytkownika
+  const handleSelectOption = async (optionText) => {
+    // znajdź indeks wybranej opcji
+    const idx = currentOptions.findIndex(opt => opt === optionText);
+    const newHistory = [
+      ...conversationHistory,
+      { question: currentQuestion, options: currentOptions, answer: optionText, effect: currentEffect, penalty: currentPenalty }
+    ];
+    setConversationHistory(newHistory);
+    if (conversationStep >= 5) {
+      setConversationStep(6);
+      return;
+    }
+    setIsLoadingAI(true);
+    setConversationStep(conversationStep + 1);
+
+    // Prompt do AI: kontynuuj rozmowę na podstawie historii
+    let historyText = newHistory.map((h, idx) => `Krok ${idx + 1}: Pytanie: ${h.question} | Odpowiedź: ${h.answer}`).join("\n");
+    const statsList = allowedStats.map(s => `"${s}"`).join(", ");
+    const systemPrompt = `Jesteś pracownikiem biura o imieniu ${activeCall?.name || ""}. Kontynuujesz rozmowę telefoniczną z kolegą z pracy. Oto dotychczasowa historia rozmowy:\n${historyText}\nZadaj kolejne pytanie (po polsku), podaj 5 możliwych odpowiedzi do wyboru oraz dla każdej odpowiedzi podaj efekt (nagrodę) i karę.\nEfekt i kara muszą być wybrane z tej listy statystyk: ${statsList}.\nEfekt to zawsze jedna statystyka z tej listy z wartością od 0 do 5 (np. "Reputacja +3"). Kara to zawsze jedna statystyka z tej listy z wartością od -5 do 0 (np. "Stres -2").\nOdpowiedz TYLKO w formacie JSON, bez żadnych opisów: {"question":"...", "options":["...","...","...","...","..."], "effects":["Reputacja +3",...], "penalties":["Cierpliwość -1",...]}`;
+    const apiMessages = [
+      { role: "system", content: systemPrompt }
+    ];
+    const aiResponse = await fetchOpenAIResponse(apiMessages);
+    let parsed;
+    try {
+      parsed = JSON.parse(aiResponse);
+    } catch {
+      // Spróbuj wyciągnąć JSON z tekstu
+      const match = aiResponse.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          parsed = JSON.parse(match[0]);
+        } catch {
+          parsed = null;
+        }
+      }
+    }
+    if (parsed && parsed.question && parsed.options && parsed.effects && parsed.penalties) {
+      setCurrentQuestion(parsed.question);
+      setCurrentOptions(parsed.options);
+      setCurrentEffect(validateEffectOrPenalty(parsed.effects[idx] || "", true));
+      setCurrentPenalty(validateEffectOrPenalty(parsed.penalties[idx] || "", false));
+    } else {
+      setCurrentQuestion("Błąd AI lub niepoprawny format odpowiedzi.");
+      setCurrentOptions([]);
+      setCurrentEffect("");
+      setCurrentPenalty("");
+    }
+    setIsLoadingAI(false);
   };
 
   const handleEndCall = () => {
     if (activeCall) {
+      // Pobierz efekt i karę z ostatniego kroku rozmowy AI
+      const lastStep = conversationHistory[conversationHistory.length - 1];
+      const effectStr = lastStep?.effect || "";
+      const penaltyStr = lastStep?.penalty || "";
+
+      // Zaktualizuj statystyki gracza
       const updatedStats = { ...JSON.parse(localStorage.getItem("playerStats")) };
-
-      if (selectedScenarioOption) {
-        const effectValue = parseInt(selectedScenarioOption.effect.match(/[-+]?\d+/)[0], 10);
-        const penaltyValue = parseInt(selectedScenarioOption.penalty.match(/[-+]?\d+/)[0], 10);
-
-        const statMapping = {
-          "Reputacja": "reputation",
-          "Zaufanie Szefa": "bossTrust",
-          "Zaufanie Zespołu": "teamTrust",
-          "Polityczny Spryt": "politicalSkill",
-          "Unikanie Odpowiedzialności": "responsibilityAvoidance",
-          "Cwaniactwo": "buzzwordPower",
-          "Stres": "stress",
-          "Cierpliwość": "patience",
-          "Autentyczność": "reputation",
-          "Produktywność Teatralna": "productivityTheatre",
-        };
-
-        Object.keys(statMapping).forEach((key) => {
-          if (selectedScenarioOption.effect.includes(key)) {
-            updatedStats[statMapping[key]] += effectValue;
-          }
-          if (selectedScenarioOption.penalty.includes(key)) {
-            updatedStats[statMapping[key]] += penaltyValue;
-          }
-        });
-      }
-
+      const statMapping = {
+        "Reputacja": "reputation",
+        "Zaufanie Szefa": "bossTrust",
+        "Zaufanie Zespołu": "teamTrust",
+        "Polityczny Spryt": "politicalSkill",
+        "Unikanie Odpowiedzialności": "responsibilityAvoidance",
+        "Cwaniactwo": "buzzwordPower",
+        "Stres": "stress",
+        "Cierpliwość": "patience",
+        "Autentyczność": "reputation",
+        "Produktywność Teatralna": "productivityTheatre",
+      };
+      // Efekt
+      Object.keys(statMapping).forEach((key) => {
+        if (effectStr.includes(key)) {
+          const match = effectStr.match(/[-+]?\d+/);
+          if (match) updatedStats[statMapping[key]] += parseInt(match[0], 10);
+        }
+        if (penaltyStr.includes(key)) {
+          const match = penaltyStr.match(/[-+]?\d+/);
+          if (match) updatedStats[statMapping[key]] += parseInt(match[0], 10);
+        }
+      });
       localStorage.setItem("playerStats", JSON.stringify(updatedStats));
 
       setCallHistory((prevHistory) => [
@@ -96,10 +256,8 @@ const CallsSection = ({ defaultContacts }) => {
         {
           ...activeCall,
           id: Date.now(),
-          scenario: selectedScenarioOption || { text: "Brak scenariusza" },
-          rating: selectedScenarioOption
-            ? { effect: selectedScenarioOption.effect, penalty: selectedScenarioOption.penalty }
-            : { effect: "Brak oceny", penalty: "Brak kary" },
+          scenario: lastStep || { text: "Brak scenariusza" },
+          rating: { effect: effectStr || "Brak oceny", penalty: penaltyStr || "Brak kary" },
         },
       ]);
     }
@@ -108,12 +266,69 @@ const CallsSection = ({ defaultContacts }) => {
     setIsCameraOn(true);
   };
 
+  // Specjalne pytanie AI po wyciszeniu lub wyłączeniu kamery
+  const askAboutMuteOrCamera = async (type) => {
+    setIsLoadingAI(true);
+    let historyText = conversationHistory.map((h, idx) => `Krok ${idx + 1}: Pytanie: ${h.question} | Odpowiedź: ${h.answer}`).join("\n");
+    const statsList = allowedStats.map(s => `"${s}"`).join(", ");
+    let specialPrompt = "";
+    if (type === "mute") {
+      specialPrompt = "W trakcie rozmowy użytkownik wyciszył mikrofon. Zadaj pytanie dotyczące tego, że rozmówca się wyciszył (np. 'Dlaczego się wyciszyłeś?'), podaj 5 możliwych odpowiedzi oraz efekty i kary jak wcześniej.";
+    } else if (type === "camera") {
+      specialPrompt = "W trakcie rozmowy użytkownik wyłączył kamerę. Zadaj pytanie dotyczące tego, że rozmówca wyłączył kamerę (np. 'Dlaczego wyłączyłeś kamerę?'), podaj 5 możliwych odpowiedzi oraz efekty i kary jak wcześniej.";
+    }
+    const systemPrompt = `Jesteś pracownikiem biura o imieniu ${activeCall?.name || ""}. Kontynuujesz rozmowę telefoniczną z kolegą z pracy. Oto dotychczasowa historia rozmowy:\n${historyText}\n${specialPrompt}\nEfekt i kara muszą być wybrane z tej listy statystyk: ${statsList}.\nEfekt to zawsze jedna statystyka z tej listy z wartością od 0 do 5 (np. "Reputacja +3"). Kara to zawsze jedna statystyka z tej listy z wartością od -5 do 0 (np. "Stres -2").\nOdpowiedz TYLKO w formacie JSON, bez żadnych opisów: {"question":"...", "options":["...","...","...","...","..."], "effects":["Reputacja +3",...], "penalties":["Cierpliwość -1",...]}`;
+    const apiMessages = [
+      { role: "system", content: systemPrompt }
+    ];
+    const aiResponse = await fetchOpenAIResponse(apiMessages);
+    let parsed;
+    try {
+      parsed = JSON.parse(aiResponse);
+    } catch {
+      const match = aiResponse.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          parsed = JSON.parse(match[0]);
+        } catch {
+          parsed = null;
+        }
+      }
+    }
+    if (parsed && parsed.question && parsed.options && parsed.effects && parsed.penalties) {
+      setCurrentQuestion(parsed.question);
+      setCurrentOptions(parsed.options);
+      setCurrentEffect(validateEffectOrPenalty(parsed.effects[0] || "", true));
+      setCurrentPenalty(validateEffectOrPenalty(parsed.penalties[0] || "", false));
+    } else {
+      setCurrentQuestion("Błąd AI lub niepoprawny format odpowiedzi.");
+      setCurrentOptions([]);
+      setCurrentEffect("");
+      setCurrentPenalty("");
+    }
+    setIsLoadingAI(false);
+  };
+
   const toggleMute = () => {
-    setIsMuted((prev) => !prev);
+    setIsMuted((prev) => {
+      const newMuted = !prev;
+      // Jeśli wyciszono podczas rozmowy, AI reaguje
+      if (!prev && activeCall && conversationStep > 0 && conversationStep <= 5) {
+        askAboutMuteOrCamera("mute");
+      }
+      return newMuted;
+    });
   };
 
   const toggleCamera = () => {
-    setIsCameraOn((prev) => !prev);
+    setIsCameraOn((prev) => {
+      const newCamera = !prev;
+      // Jeśli wyłączono kamerę podczas rozmowy, AI reaguje
+      if (prev && activeCall && conversationStep > 0 && conversationStep <= 5) {
+        askAboutMuteOrCamera("camera");
+      }
+      return newCamera;
+    });
   };
 
   const formatTime = (isoString) => {
@@ -132,39 +347,41 @@ const CallsSection = ({ defaultContacts }) => {
       : callHistory.filter((call) => call.type === filter);
 
   if (activeCall) {
-    const scenario =
-      scenarios.length > 1
-        ? scenarios[Math.floor(Math.random() * scenarios.length)]
-        : scenarios.length === 1
-        ? scenarios[0]
-        : null;
-
     return (
       <section className={styles.activeCallSection}>
         <h2>Rozmowa z {activeCall.name}</h2>
         <div className={styles.videoPlaceholder}>
-          {selectedScenarioOption ? (
-            <div className={styles.evaluation}>
-              <h3>Ocena Twojej Decyzji</h3>
-              <p><strong>Efekt:</strong> {selectedScenarioOption.effect}</p>
-              <p><strong>Kara:</strong> {selectedScenarioOption.penalty}</p>
-            </div>
-          ) : scenario ? (
+          {isLoadingAI ? (
+            <p>AI generuje pytanie...</p>
+          ) : conversationStep > 0 && conversationStep <= 5 ? (
             <>
-              <p>{scenario.question}</p>
+              <p>{currentQuestion}</p>
               <ul className={styles.scenarioOptions}>
-                {scenario.options.map((option) => (
-                  <li key={option.id} className={styles.scenarioOption}>
+                {currentOptions.map((option, idx) => (
+                  <li key={idx} className={styles.scenarioOption}>
                     <button
-                      onClick={() => setSelectedScenarioOption(option)}
+                      onClick={() => handleSelectOption(option)}
                       className={styles.scenarioButton}
+                      disabled={isLoadingAI}
                     >
-                      {option.text}
+                      {option}
                     </button>
                   </li>
                 ))}
               </ul>
+              <p className={styles.stepInfo}>Krok {conversationStep} / 5</p>
             </>
+          ) : conversationStep > 5 ? (
+            <div className={styles.evaluation}>
+              <h3>To wszystko, o co chciałem zapytać.</h3>
+              <p>Kontakt się rozłączył.</p>
+              {conversationHistory.length > 0 && (
+                <>
+                  <p><strong>Efekt:</strong> {conversationHistory[conversationHistory.length-1].effect || "-"}</p>
+                  <p><strong>Kara:</strong> {conversationHistory[conversationHistory.length-1].penalty || "-"}</p>
+                </>
+              )}
+            </div>
           ) : (
             <p>Brak dostępnych scenariuszy.</p>
           )}
