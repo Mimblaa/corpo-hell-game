@@ -9,6 +9,61 @@ import yourAvatar from './assets/icons/profile-icon.png';
 import { generateRecurringInstances } from "./calendar_components/EventContext"; // Import the function
 
 function App() {
+  // --- Incoming Call Global State ---
+  const [incomingCall, setIncomingCall] = useState(null); // {id, name}
+  const [activeCall, setActiveCall] = useState(null);
+  const [callHistory, setCallHistory] = useState(() => {
+    const savedHistory = localStorage.getItem("callHistory");
+    return savedHistory ? JSON.parse(savedHistory) : [];
+  });
+  const [contacts, setContacts] = useState(() => {
+    const savedChats = localStorage.getItem("chats");
+    return savedChats ? JSON.parse(savedChats).map(chat => ({ id: chat.id, name: chat.name })) : [];
+  });
+
+  // Incoming call timer (every 30s for testing)
+  React.useEffect(() => {
+    if (!activeCall && !incomingCall && contacts.length > 0) {
+      const timeout = setTimeout(() => {
+        const randomContact = contacts[Math.floor(Math.random() * contacts.length)];
+        setIncomingCall(randomContact);
+      }, 30000); // 30 seconds
+      return () => clearTimeout(timeout);
+    }
+  }, [activeCall, incomingCall, contacts]);
+
+  // Accept incoming call handler
+  const handleAcceptIncomingCall = (cb) => {
+    if (incomingCall) {
+      setIncomingCall(null);
+      if (cb) cb(incomingCall); // Pass to CallsSection
+    }
+  };
+
+  // Reject incoming call handler (applies penalty and logs missed call)
+  const handleRejectIncomingCall = () => {
+    if (incomingCall) {
+      // Example penalty: Stress +2, Reputation -1
+      const updatedStats = { ...JSON.parse(localStorage.getItem("playerStats")) };
+      if (typeof updatedStats.stress === "number") updatedStats.stress += 2;
+      if (typeof updatedStats.reputation === "number") updatedStats.reputation -= 1;
+      localStorage.setItem("playerStats", JSON.stringify(updatedStats));
+      const newHistory = [
+        ...callHistory,
+        {
+          ...incomingCall,
+          id: Date.now(),
+          time: new Date().toISOString(),
+          type: "missed",
+          scenario: { text: "Odrzucono połączenie" },
+          rating: { effect: "-", penalty: "Stres +2, Reputacja -1" },
+        },
+      ];
+      setCallHistory(newHistory);
+      localStorage.setItem("callHistory", JSON.stringify(newHistory));
+      setIncomingCall(null);
+    }
+  };
   const [isAppVisible, setIsAppVisible] = useState(false);
   const [isQuestionnaireComplete, setIsQuestionnaireComplete] = useState(() => {
     return !!localStorage.getItem("playerStats");
@@ -499,7 +554,13 @@ function App() {
           </div>
         )
       ) : (
-        <AppLayout />
+        <AppLayout
+          incomingCall={incomingCall}
+          onAcceptIncomingCall={handleAcceptIncomingCall}
+          onRejectIncomingCall={handleRejectIncomingCall}
+          setActiveCall={setActiveCall}
+          activeCall={activeCall}
+        />
       )}
     </div>
   );
