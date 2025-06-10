@@ -31,7 +31,14 @@ async function fetchOpenAIResponse(apiMessages) {
   }
 }
 
-const CallsSection = ({ defaultContacts }) => {
+const CallsSection = ({
+  incomingCall,
+  onAcceptIncomingCall,
+  onRejectIncomingCall,
+  setActiveCall,
+  activeCall
+}) => {
+
 
   // --- AI Conversation State ---
   const [conversationStep, setConversationStep] = useState(0); // 0 = not started, 1-5 = in progress
@@ -57,7 +64,6 @@ const CallsSection = ({ defaultContacts }) => {
     return savedChats ? JSON.parse(savedChats).map(chat => ({ id: chat.id, name: chat.name })) : [];
   });
 
-  const [activeCall, setActiveCall] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOn, setIsCameraOn] = useState(true);
   const [selectedScenarioOption, setSelectedScenarioOption] = useState(null);
@@ -157,13 +163,27 @@ const CallsSection = ({ defaultContacts }) => {
       setCurrentEffect(validateEffectOrPenalty(parsed.effects[0] || "", true));
       setCurrentPenalty(validateEffectOrPenalty(parsed.penalties[0] || "", false));
     } else {
-      setCurrentQuestion("Błąd AI lub niepoprawny format odpowiedzi.");
+      setCurrentQuestion(aiResponse || "Błąd AI lub niepoprawny format odpowiedzi.");
       setCurrentOptions([]);
       setCurrentEffect("");
       setCurrentPenalty("");
     }
     setIsLoadingAI(false);
   };
+
+  // --- Ensure AI conversation starts after accepting incoming call ---
+  useEffect(() => {
+    // Only trigger if activeCall is set, conversation not started, and not loading
+    if (
+      activeCall &&
+      conversationStep === 0 &&
+      !isLoadingAI
+    ) {
+      // Defensive: avoid double-trigger if already started
+      handleStartCall(activeCall);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCall]);
 
   // Obsługa wyboru odpowiedzi przez użytkownika
   const handleSelectOption = async (optionText) => {
@@ -209,7 +229,7 @@ const CallsSection = ({ defaultContacts }) => {
       setCurrentEffect(validateEffectOrPenalty(parsed.effects[idx] || "", true));
       setCurrentPenalty(validateEffectOrPenalty(parsed.penalties[idx] || "", false));
     } else {
-      setCurrentQuestion("Błąd AI lub niepoprawny format odpowiedzi.");
+      setCurrentQuestion(aiResponse || "Błąd AI lub niepoprawny format odpowiedzi.");
       setCurrentOptions([]);
       setCurrentEffect("");
       setCurrentPenalty("");
@@ -345,6 +365,38 @@ const CallsSection = ({ defaultContacts }) => {
     filter === "all"
       ? callHistory
       : callHistory.filter((call) => call.type === filter);
+
+
+  // Incoming call popup is now global (handled in AppLayout)
+
+  // --- Incoming call popup (modal style) ---
+  if (incomingCall) {
+    // Try to get avatar for the caller (fallback to default icon)
+    let avatarUrl = require("../assets/icons/user-avatar.png");
+    const chat = contacts.find(c => c.id === incomingCall.id);
+    if (chat && chat.avatar) {
+      avatarUrl = chat.avatar;
+    }
+    return (
+      <div className={styles.incomingCallModalOverlay}>
+        <div className={styles.incomingCallModal}>
+          <div className={styles.avatarContainer}>
+            <img src={avatarUrl} alt="Avatar" className={styles.avatar} />
+          </div>
+          <div className={styles.callerName}>{incomingCall.name}</div>
+          <div className={styles.callerSubtitle}>dzwoni do Ciebie...</div>
+          <div className={styles.modalButtonRow}>
+            <button className={styles.controlButton} onClick={() => onAcceptIncomingCall && onAcceptIncomingCall()}>
+              Odbierz
+            </button>
+            <button className={styles.endCallButton} onClick={onRejectIncomingCall}>
+              Odrzuć
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (activeCall) {
     return (

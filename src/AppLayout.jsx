@@ -12,8 +12,15 @@ import OneDriveSection from "./onedrive_components/OneDriveSection";
 import CallsSection from "./calls_components/CallsSection";
 import NotificationSection from "./notification_components/NotificationSection";
 import styles from "./styles/AppLayout.module.css";
+import callsStyles from "./calls_components/CallsSection.module.css";
 
-const AppLayout = () => {
+const AppLayout = ({
+  incomingCall,
+  onAcceptIncomingCall,
+  onRejectIncomingCall,
+  setActiveCall,
+  activeCall
+}) => {
   const [activeSection, setActiveSection] = useState(() => {
     const storedSection = localStorage.getItem("activeSection");
     return storedSection || "chat";
@@ -53,7 +60,13 @@ const AppLayout = () => {
       case "onedrive":
         return <OneDriveSection />;
       case "calls":
-        return <CallsSection />;
+        return <CallsSection
+          incomingCall={incomingCall}
+          onAcceptIncomingCall={onAcceptIncomingCall}
+          onRejectIncomingCall={onRejectIncomingCall}
+          setActiveCall={setActiveCall}
+          activeCall={activeCall}
+        />;
       case "notification":
         return <NotificationSection />;
       default:
@@ -63,16 +76,61 @@ const AppLayout = () => {
 
   // Ustal poziom trudności globalnie (możesz pobierać z ustawień gracza)
   const difficulty = "hard";
+  // Handler for accepting incoming call: set section to 'calls' and start call
+  const handleAcceptAndSwitchToCall = () => {
+    if (onAcceptIncomingCall) {
+      onAcceptIncomingCall((contact) => {
+        if (setActiveCall) setActiveCall(contact);
+        setActiveSection("calls");
+      });
+    }
+  };
+
   return (
     <main className={styles.layout}>
       {/* Generator AI tasków i AI wiadomości działa globalnie */}
       <GlobalAiTaskGenerator difficulty={difficulty} />
       <GlobalAiChatGenerator difficulty={difficulty} />
       <AppHeader onSearch={handleSearch} />
+      {/* Global incoming call popup (styled like CallsSection) */}
+      {incomingCall && (() => {
+        // Try to get avatar for the caller (fallback to default icon)
+        let avatarUrl = require("./assets/icons/user-avatar.png");
+        let contacts = [];
+        try {
+          const savedChats = localStorage.getItem("chats");
+          if (savedChats) {
+            contacts = JSON.parse(savedChats).map(chat => ({ id: chat.id, name: chat.name, avatar: chat.avatar }));
+          }
+        } catch {}
+        const chat = contacts.find(c => c.id === incomingCall.id);
+        if (chat && chat.avatar) {
+          avatarUrl = chat.avatar;
+        }
+        return (
+          <div className={callsStyles.incomingCallModalOverlay}>
+            <div className={callsStyles.incomingCallModal}>
+              <div className={callsStyles.avatarContainer}>
+                <img src={avatarUrl} alt="Avatar" className={callsStyles.avatar} />
+              </div>
+              <div className={callsStyles.callerName}>{incomingCall.name}</div>
+              <div className={callsStyles.callerSubtitle}>dzwoni do Ciebie...</div>
+              <div className={callsStyles.modalButtonRow}>
+                <button className={callsStyles.controlButton} onClick={handleAcceptAndSwitchToCall}>
+                  Odbierz
+                </button>
+                <button className={callsStyles.endCallButton} onClick={onRejectIncomingCall}>
+                  Odrzuć
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
       <div className={styles.contentWrapper}>
         <Sidebar
           activeSection={activeSection}
-          onSectionChange={handleSectionChange} // Pass updated handler
+          onSectionChange={handleSectionChange}
         />
         {renderContent()}
       </div>
