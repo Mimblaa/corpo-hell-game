@@ -138,7 +138,7 @@ const MainContent = () => {
       };
       setTasks((prev) => [...prev, newTask]);
     } catch (e) {
-      alert("Nie udało się wygenerować zadania AI: " + e.message);
+      console.error("Nie udało się wygenerować zadania AI: " + e.message);
     } finally {
       setIsAiLoading(false);
     }
