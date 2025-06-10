@@ -42,7 +42,7 @@ Pytanie nie powinno zawierać szczegółów odnośnie zadania, ale ogólnie o co
     if (!content) throw new Error("AI nie zwróciło treści wiadomości");
     return content;
   } catch (e) {
-    alert("Nie udało się wygenerować wiadomości AI: " + e.message);
+    console.error("Nie udało się wygenerować wiadomości AI: " + e.message);
     return "Przepraszam, nie mogę wygenerować wiadomości w tej chwili.";
   }
 }
@@ -141,8 +141,7 @@ async function generateAiTask(aiType = "Notebook", chatId) {
 
     return newTask;
   } catch (e) {
-    // eslint-disable-next-line no-alert
-    alert("Nie udało się wygenerować zadania AI: " + e.message);
+    console.error("Nie udało się wygenerować zadania AI: " + e.message);
   }
 }
 

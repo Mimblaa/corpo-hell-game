@@ -73,7 +73,7 @@ export const EventModal = ({ event, onClose }) => {
 
       onClose();
     } catch (error) {
-      alert(error.message);
+      console.error(error.message);
     }
   };
 
