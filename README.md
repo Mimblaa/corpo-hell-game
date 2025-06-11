@@ -15,19 +15,19 @@
 - **AI Avatar Generation**: Instantly create photorealistic avatars using the Stable Diffusion model. Users can customize gender, skin tone, hairstyle, accessories, and more, with results generated on demand.
 
   <!-- Place a screenshot or GIF of the avatar generation feature below -->
-  ![Avatar Generation Example](docs/screenshots/avatar-generation.png)
+  <img src="docs/screenshots/avatar-generation.png" alt="Avatar Generation Example" width="600"/>
 
 - **SVG & Predefined Avatars**: Instead of generating, users can also select from a set of ready-made SVG avatars. This allows for instant avatar assignment without waiting for AI generation. SVG avatars are lightweight, customizable, and ideal for quick profile setup.
 
-  ![SVG Avatar Example](docs/screenshots/svg-avatar.png)
+  <img src="docs/screenshots/svg-avatar.png" alt="SVG Avatar Example" width="600"/>
 
 - **Conversational AI**: Engage in dynamic conversations with AI-powered chatbots, simulating real corporate communication and support scenarios.
 
-  ![AI Chat Example](docs/screenshots/ai-chat.png)
+  <img src="docs/screenshots/ai-chat.png" alt="AI Chat Example" width="600"/>
 
 - **Random Identity Generator**: Generate random names and faces for avatars, ideal for testing, onboarding, or role-play scenarios.
 
-  ![Random Identity Example](docs/screenshots/random-identity.png)
+  <img src="docs/screenshots/random-identity.png" alt="Random Identity Example" width="600"/>
 
 
 
@@ -37,24 +37,24 @@
   - **Email Client**: Play with simulated emails, often with a humorous or unexpected twist.
   - **Calculator**: Solve quirky office math puzzles and challenges.
 
-  ![Task Dashboard](docs/screenshots/task-example.png)
+  <img src="docs/screenshots/task-example.png" alt="Task Dashboard" width="600"/>
 
-  ![Email Rask Example](docs/screenshots/email.png)
+  <img src="docs/screenshots/email.png" alt="Email Rask Example" width="600"/>
 
-  ![Quiz Example](docs/screenshots/quiz.png)
+  <img src="docs/screenshots/quiz.png" alt="Quiz Example" width="600"/>
 
-  ![Drawing Example](docs/screenshots/drawing.png)
+  <img src="docs/screenshots/drawing.png" alt="Drawing Example" width="600"/>
 
 - **Player Statistics & Progress**: Track your progress like in any good game! The app records your completed challenges, quiz scores, and achievements, letting you compete with yourself or others on the corporate leaderboard. All stats are for fun and game progression only.
 
-  ![Statistics Example](docs/screenshots/statistics.png)
+  <img src="docs/screenshots/statistics.png" alt="Statistics Example" width="600"/>
 
 
 - **Notifications & Calls**: Simulate corporate notifications and call features, enhancing the realism of the environment.
 
-  ![Notifications Example](docs/screenshots/notifications.png)
+  <img src="docs/screenshots/notifications.png" alt="Notifications Example" width="600"/>
 
-  ![Calls Example](docs/screenshots/calls.png)
+  <img src="docs/screenshots/calls.png" alt="Calls Example" width="600"/>
 
 ---
 
