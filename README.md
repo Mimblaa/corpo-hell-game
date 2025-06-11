@@ -3,18 +3,58 @@
 
 ## Project Overview
 
-**Corpo Hell Game** is an advanced web application that immerses users in a satirical corporate environment, blending productivity tools with AI-driven features. The project is divided into a modern React frontend and a robust Python FastAPI backend. It is designed as both a playful simulation and a demonstration of integrating AI with business-style web apps.
+
+**Corpo Hell Game** is a satirical browser game that parodies the absurdities of corporate life. Compete in office-themed mini-games, generate hilarious avatars, and climb the corporate leaderboard! The project combines a playful React frontend with an AI-powered Python backend, delivering a unique blend of fun, creativity, and parody. All features are designed as interactive games or challenges, not as real productivity tools.
 
 ---
+
+
 
 ## Key Features
 
 - **AI Avatar Generation**: Instantly create photorealistic avatars using the Stable Diffusion model. Users can customize gender, skin tone, hairstyle, accessories, and more, with results generated on demand.
+
+  <!-- Place a screenshot or GIF of the avatar generation feature below -->
+  ![Avatar Generation Example](docs/screenshots/avatar-generation.png)
+
+- **SVG & Predefined Avatars**: Instead of generating, users can also select from a set of ready-made SVG avatars. This allows for instant avatar assignment without waiting for AI generation. SVG avatars are lightweight, customizable, and ideal for quick profile setup.
+
+  ![SVG Avatar Example](docs/screenshots/svg-avatar.png)
+
 - **Conversational AI**: Engage in dynamic conversations with AI-powered chatbots, simulating real corporate communication and support scenarios.
+
+  ![AI Chat Example](docs/screenshots/ai-chat.png)
+
 - **Random Identity Generator**: Generate random names and faces for avatars, ideal for testing, onboarding, or role-play scenarios.
-- **Productivity Suite**: Includes a calendar, notepad, email client, file storage, and calculator, all styled to mimic a real corporate dashboard.
-- **Drag & Drop Interface**: Move and organize widgets and applications within the dashboard for a personalized workspace experience.
+
+  ![Random Identity Example](docs/screenshots/random-identity.png)
+
+
+
+- **Mini-Games & Corporate Apps**: The dashboard is packed with interactive mini-games and playful challenges, all themed around the chaos of office life. These are not real productivity tools, but game-like experiences, such as:
+  - **Calendar**: Gamified planning of (fake) workdays and meetings.
+  - **Notepad**: Doodle, draw, and present as part of creative office tasks.
+  - **Email Client**: Play with simulated emails, often with a humorous or unexpected twist.
+  - **Calculator**: Solve quirky office math puzzles and challenges.
+
+  ![Task Dashboard](docs/screenshots/task-example.png)
+
+  ![Email Rask Example](docs/screenshots/email.png)
+
+  ![Quiz Example](docs/screenshots/quiz.png)
+
+  ![Drawing Example](docs/screenshots/drawing.png)
+
+- **Player Statistics & Progress**: Track your progress like in any good game! The app records your completed challenges, quiz scores, and achievements, letting you compete with yourself or others on the corporate leaderboard. All stats are for fun and game progression only.
+
+  ![Statistics Example](docs/screenshots/statistics.png)
+
+
 - **Notifications & Calls**: Simulate corporate notifications and call features, enhancing the realism of the environment.
+
+  ![Notifications Example](docs/screenshots/notifications.png)
+
+  ![Calls Example](docs/screenshots/calls.png)
 
 ---
 
