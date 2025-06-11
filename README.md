@@ -14,7 +14,6 @@
 
 - **AI Avatar Generation**: Instantly create photorealistic avatars using the Stable Diffusion model. Users can customize gender, skin tone, hairstyle, accessories, and more, with results generated on demand.
 
-  <!-- Place a screenshot or GIF of the avatar generation feature below -->
   <img src="docs/avatar-generation.png" alt="Avatar Generation Example" width="600"/>
 
 - **SVG & Predefined Avatars**: Instead of generating, users can also select from a set of ready-made SVG avatars. This allows for instant avatar assignment without waiting for AI generation. SVG avatars are lightweight, customizable, and ideal for quick profile setup.
