@@ -1,79 +1,157 @@
-# Corpo-hell-game
 
-# Getting Started with Create React App
+# Corpo Hell Game
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Overview
 
-## Available Scripts
+**Corpo Hell Game** is an advanced web application that immerses users in a satirical corporate environment, blending productivity tools with AI-driven features. The project is divided into a modern React frontend and a robust Python FastAPI backend. It is designed as both a playful simulation and a demonstration of integrating AI with business-style web apps.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Key Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **AI Avatar Generation**: Instantly create photorealistic avatars using the Stable Diffusion model. Users can customize gender, skin tone, hairstyle, accessories, and more, with results generated on demand.
+- **Conversational AI**: Engage in dynamic conversations with AI-powered chatbots, simulating real corporate communication and support scenarios.
+- **Random Identity Generator**: Generate random names and faces for avatars, ideal for testing, onboarding, or role-play scenarios.
+- **Productivity Suite**: Includes a calendar, notepad, email client, file storage, and calculator, all styled to mimic a real corporate dashboard.
+- **Drag & Drop Interface**: Move and organize widgets and applications within the dashboard for a personalized workspace experience.
+- **Notifications & Calls**: Simulate corporate notifications and call features, enhancing the realism of the environment.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Technology Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend
+- **React** (with hooks and functional components)
+- **React DnD** for drag-and-drop functionality
+- **React Quill** for rich text editing
+- **Modern JavaScript (ES6+)**
+- **Custom CSS Modules** for scoped styling
 
-### `npm run build`
+### Backend
+- **FastAPI** for high-performance API endpoints
+- **Stable Diffusion (Diffusers, Torch, Transformers)** for AI image generation
+- **Pydantic** for data validation
+- **Faker** for random name generation
+- **Uvicorn** as the ASGI server
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 1. Clone the Repository
 
-### `npm run eject`
+```powershell
+git clone https://github.com/your-username/corpo-hell-game.git
+cd corpo-hell-game
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 2. Frontend Setup
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Install all required dependencies:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```powershell
+npm install
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Create a `.env` file in the root directory and add your OpenAI API key for chat features:
 
+```
+REACT_APP_OPENAI_API_KEY=your_actual_openai_api_key_here
+```
 
-In backend directory run:
+To launch the React development server:
 
-### `uvicorn generate_avatar:app --reload`
+```powershell
+npm start
+```
 
-This command starts the backend server responsible for AI avatar image generation with hot reload enabled.
+Visit [http://localhost:3000](http://localhost:3000) in your browser to use the app.
 
-## Learn More
+### 3. Backend Setup
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Navigate to the backend directory:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```powershell
+cd backend
+```
 
-### Code Splitting
+Install Python dependencies (preferably in a virtual environment):
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```powershell
+pip install -r requirements.txt
+```
 
-### Analyzing the Bundle Size
+Start the FastAPI backend server:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```powershell
+uvicorn generate_avatar:app --reload
+```
 
-### Making a Progressive Web App
+The backend API will be available at [http://localhost:8000](http://localhost:8000).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## Configuration & Environment Variables
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Frontend
+- Create a `.env` file in the project root with:
+  ```
+  REACT_APP_OPENAI_API_KEY=your_actual_openai_api_key_here
+  ```
+  This key is required for AI chat features. You can obtain an API key from [OpenAI](https://platform.openai.com/account/api-keys).
 
-### Deployment
+### Backend
+- No API keys are required by default. If you extend the backend to use external APIs, document and add them to a `.env` file in the `backend/` directory.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## Useful Commands
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Frontend
+- `npm start` – Launches the development server
+- `npm run build` – Builds the app for production
+- `npm test` – Runs the test suite
+
+### Backend
+- `uvicorn generate_avatar:app --reload` – Starts the FastAPI server with hot reload
+
+---
+
+## Directory Structure
+
+```
+corpo-hell-game/
+│
+├── backend/
+│   ├── generate_avatar.py         # FastAPI app for avatar/image generation
+│   ├── requirements.txt          # Python dependencies
+│   └── ...
+├── public/                       # Static files for React
+├── src/                          # All React components and modules
+│   ├── apps_components/          # Productivity widgets (Notepad, Email, etc.)
+│   ├── calendar_components/      # Calendar and scheduling tools
+│   ├── calls_components/         # Call simulation features
+│   ├── chat_components/          # AI chat and messaging
+│   ├── notification_components/  # Notification system
+│   ├── onedrive_components/      # Local storage
+│   ├── task_components/          # Task management and AI task generator
+│   └── ...
+├── package.json                  # Frontend dependencies and scripts
+└── README.md                     # Project documentation
+```
+
+---
+
+## Additional Information
+
+- **Performance**: For best results in avatar generation, use a machine with a CUDA-enabled GPU. CPU-only systems will work but may be significantly slower.
+- **Extensibility**: The backend is modular and can be extended with new endpoints or AI models. The frontend is component-based for easy feature addition.
+- **Testing**: The project includes scripts for running frontend tests. Backend endpoints can be tested with tools like Postman or curl.
+- **Security**: Do not commit your `.env` files or API keys to version control. Use `.gitignore` to keep secrets safe.
+- **Collaboration**: The codebase is organized for team development, with clear separation of concerns and modular design.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
